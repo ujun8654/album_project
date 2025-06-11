@@ -9,4 +9,8 @@ public class Album {
     private String artist;
     private String coverImgUrl;
     private String releaseDate;
+    private String spotifyId;
+    private String spotifyUrl;
+    private String genre;
+
 }

@@ -34,5 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addInterceptor(needLogoutInterceptor).addPathPatterns("/usr/member/join")
 				.addPathPatterns("/usr/member/login").addPathPatterns("/usr/member/doLogin");
 	}
+	
+	
 
 }

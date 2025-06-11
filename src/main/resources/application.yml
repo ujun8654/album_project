@@ -25,21 +25,10 @@ spring:
           auth: true
           starttls:
             enable: true
-    
-custom:
-  file:
-    dir: D:cjhupload
-#server:
-#  port: 8081
-#  servlet:
-#    context-path: /test
 
 
 
-#
-#spring.mail.host=smtp.gmail.com
-#spring.mail.port=465
-#spring.mail.username= 송신자 이메일
-#spring.mail.password= 앱 비밀번호
-#spring.mail.properties.mail.smtp.auth=true
-#spring.mail.protocol=smtps?
+spotify:
+  client-id: a23bd61419a640d9bd60b9e86005eb74
+  client-secret: 9bd8156f80624dc2896bdbde0b233c69
+#unknown property 'spotify' [YAML_UNKNOWN_PROPERTY]

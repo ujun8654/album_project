@@ -64,7 +64,7 @@
     <a href="/" class="logo">AlbumRate</a>
 
     <div class="menu">
-      <a href="/usr/album/list">앨범</a>
+      <a href="/albums">앨범</a>
       <a href="#">듣고싶어요</a>
       <a href="#">통계</a>
       <a href="#">친구</a>
