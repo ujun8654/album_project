@@ -17,8 +17,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: your_email@gmail.com
-    password: your_app_password
+    username: anjaeudv@gmail.com
+    password: zbnt yjmv nodx kpvl
     properties:
       mail:
         smtp:
@@ -36,4 +36,10 @@ custom:
 
 
 
-
+#
+#spring.mail.host=smtp.gmail.com
+#spring.mail.port=465
+#spring.mail.username= 송신자 이메일
+#spring.mail.password= 앱 비밀번호
+#spring.mail.properties.mail.smtp.auth=true
+#spring.mail.protocol=smtps?

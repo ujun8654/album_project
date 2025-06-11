@@ -1,93 +1,82 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
 
-<c:set var="pageTitle" value="로그인" />
+    .input-bordered {
+      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+      padding: 0.5rem;
+      width: 100%;
+    }
 
+    .form-control {
+      margin-bottom: 1.5rem;
+    }
+
+    .label-text {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: #111827;
+    }
+
+    .btn {
+      background-color: #1f2937;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      text-align: center;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #374151;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
 <%@ include file="/WEB-INF/jsp/common/header.jsp" %>
 
-	<script>
-		const loginFormChk = function (form) {
-			form.loginId.value = form.loginId.value.trim();
-			form.loginPw.value = form.loginPw.value.trim();
-			
-			if (form.loginId.value.length == 0) {
-				alert('아이디는 필수 입력 정보입니다');
-				form.loginId.focus();
-				return false;
-			}
-			
-			if (form.loginPw.value.length == 0) {
-				alert('비밀번호는 필수 입력 정보입니다');
-				form.loginPw.focus();
-				return false;
-			}
-			
-			return true;
-		}
-	</script>
+<div class="max-w-md mx-auto mt-12 bg-white p-8 rounded shadow-md">
+  <h1 class="text-2xl font-bold mb-6 text-center">로그인</h1>
 
-	<section class="mt-8">
-		<div class="container mx-auto">
-			<form action="doLogin" method="post" onsubmit="return loginFormChk(this);">
-				<div class="table-box">
-					<table class="table">
-						<tr>
-							<td colspan="2">
-								<label class="input">
-								  <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-								    <g
-								      stroke-linejoin="round"
-								      stroke-linecap="round"
-								      stroke-width="2.5"
-								      fill="none"
-								      stroke="currentColor"
-								    >
-								      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-								      <circle cx="12" cy="7" r="4"></circle>
-								    </g>
-								  </svg>
-								  <input
-								    type="text"
-								    name="loginId"
-								  />
-								</label>
-							</td>
-						</tr>
-						<tr>
-							<td colspan="2">
-								<label class="input">
-								  <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-								    <g
-								      stroke-linejoin="round"
-								      stroke-linecap="round"
-								      stroke-width="2.5"
-								      fill="none"
-								      stroke="currentColor"
-								    >
-								      <path
-								        d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"
-								      ></path>
-								      <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
-								    </g>
-								  </svg>
-								  <input
-								    type="password"
-								    name="loginPw"
-								  />
-							</td>
-						</tr>
-						<tr>
-							<td colspan="2"><button class="btn btn-neutral btn-outline btn-sm btn-wide">로그인</button></td>
-						</tr>
-					</table>
-				</div>
-			</form>
-			
-			<div class="p-6">
-				<div><button class="btn btn-neutral btn-outline btn-xs" onclick="history.back();">뒤로가기</button></div>
-			</div>
-		</div>
-	</section>
+  <form action="/usr/member/doLogin" method="post">
+    <div class="form-control">
+      <label class="label-text">아이디</label>
+      <input type="text" name="loginId" class="input-bordered" required>
+    </div>
+
+    <div class="form-control">
+      <label class="label-text">비밀번호</label>
+      <input type="password" name="loginPw" class="input-bordered" required>
+
+      <c:if test="${not empty errorMsg}">
+        <p class="error-msg">${errorMsg}</p>
+      </c:if>
+    </div>
+
+    <div class="mt-6">
+      <button type="submit" class="btn w-full">로그인</button>
+    </div>
+  </form>
+</div>
 
 <%@ include file="/WEB-INF/jsp/common/footer.jsp" %>
+</body>
+</html>

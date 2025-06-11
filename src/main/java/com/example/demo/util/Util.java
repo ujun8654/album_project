@@ -54,4 +54,13 @@ public class Util {
             throw new RuntimeException("SHA-256 알고리즘을 지원하지 않습니다.", e);
         }
     }
+	
+	public static String jsReplaceGo(String uri) {
+	    return """
+	            <script>
+	                location.replace('%s');
+	            </script>
+	            """.formatted(uri);
+	}
+
 }

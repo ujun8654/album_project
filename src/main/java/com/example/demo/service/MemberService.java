@@ -14,13 +14,19 @@ public class MemberService {
 		this.memberDao = memberDao;
 	}
 
-	public void joinMember(String loginId, String loginPw, String name) {
-		this.memberDao.joinMember(loginId, loginPw, name);
-	}
 
 	public Member getMemberByLoginId(String loginId) {
 		return this.memberDao.getMemberByLoginId(loginId);
 	}
+	
+	public void joinMember(String loginId, String loginPw, String email) {
+		memberDao.joinMember(loginId, loginPw, email);
+	}
+
+	public Member getMemberByEmail(String email) {
+		return memberDao.getMemberByEmail(email);
+	}
+
 
 	public String getLoginId(int id) {
 		return this.memberDao.getLoginId(id);

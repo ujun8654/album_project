@@ -44,21 +44,36 @@ public class UsrMemberController {
 	}
 
 	@PostMapping("/doJoin")
-	public String doJoin(String loginId, String loginPw, String name, String email, String emailCode, HttpSession session, Model model) {
-		String sessionCode = (String) session.getAttribute("emailAuthCode");
-		String sessionEmail = (String) session.getAttribute("emailAuthTarget");
+	public String doJoin(String loginId, String loginPw, String email, String emailCode, HttpSession session, Model model) {
+	    String sessionCode = (String) session.getAttribute("emailAuthCode");
+	    String sessionEmail = (String) session.getAttribute("emailAuthTarget");
 
-		if (sessionCode == null || sessionEmail == null || !sessionEmail.equals(email) || !sessionCode.equals(emailCode)) {
-			model.addAttribute("errorMsg", "이메일 인증코드가 일치하지 않습니다.");
-			return "usr/member/join";
-		}
+	    if (sessionCode == null || sessionEmail == null || !sessionEmail.equals(email) || !sessionCode.equals(emailCode)) {
+	        model.addAttribute("errorMsg", "이메일 인증코드가 일치하지 않습니다.");
+	        return "usr/member/join";
+	    }
 
-		memberService.joinMember(loginId, loginPw, name);
-		session.removeAttribute("emailAuthCode");
-		session.removeAttribute("emailAuthTarget");
+	    if (memberService.getMemberByLoginId(loginId) != null) {
+	        model.addAttribute("errorMsg", "이미 사용 중인 아이디입니다.");
+	        return "usr/member/join";
+	    }
 
-		return "redirect:/usr/member/login";
+	    if (memberService.getMemberByEmail(email) != null) {
+	        model.addAttribute("errorMsg", "이미 사용 중인 이메일입니다.");
+	        return "usr/member/join";
+	    }
+
+	    String encryptedPw = Util.encryptSHA256(loginPw);
+	    memberService.joinMember(loginId, encryptedPw, email);
+
+	    session.removeAttribute("emailAuthCode");
+	    session.removeAttribute("emailAuthTarget");
+
+	    return "redirect:/usr/member/login";
 	}
+
+
+
 
 	@PostMapping("/sendEmailCode")
 	@ResponseBody
@@ -80,6 +95,8 @@ public class UsrMemberController {
 	@ResponseBody
 	public ResultData loginIdDupChk(String loginId) {
 		Member member = this.memberService.getMemberByLoginId(loginId);
+		System.out.println("서버에서 받은 loginId: " + loginId);
+
 
 		if (member != null) {
 			return ResultData.from("F-1", String.format("[ %s ] 은(는) 이미 사용중인 아이디입니다", loginId));
@@ -94,28 +111,24 @@ public class UsrMemberController {
 	}
 
 	@PostMapping("/doLogin")
-	@ResponseBody
-	public String doLogin(String loginId, String loginPw) {
-		Member member = this.memberService.getMemberByLoginId(loginId);
+	public String doLogin(String loginId, String loginPw, Model model) {
+		Member member = memberService.getMemberByLoginId(loginId);
 
-		if (member == null) {
-			return Util.jsReplace(String.format("[ %s ] 은(는) 존재하지 않는 회원입니다", loginId), "login");
+		if (member == null || !member.getLoginPw().equals(Util.encryptSHA256(loginPw))) {
+			model.addAttribute("errorMsg", "아이디 또는 비밀번호가 잘못되었습니다.");
+			return "usr/member/login";
 		}
 
-		if (!member.getLoginPw().equals(Util.encryptSHA256(loginPw))) {
-			return Util.jsReplace("비밀번호가 일치하지 않습니다", "login");
-		}
-
-		this.req.login(new LoginedMember(member.getId(), member.getAuthLevel()));
-
-		return Util.jsReplace(String.format("[ %s ] 님 환영합니다", member.getLoginId()), "/");
+		req.login(new LoginedMember(member.getId(), member.getAuthLevel()));
+		return "redirect:/";
 	}
+ 
 
 	@GetMapping("/logout")
 	@ResponseBody
 	public String logout() {
-		this.req.logout();
-		return Util.jsReplace("정상적으로 로그아웃 되었습니다", "/");
+		req.logout();
+		return Util.jsReplaceGo("/");
 	}
 
 	@GetMapping("/getLoginId")
