@@ -339,6 +339,39 @@ public class SpotifyService {
             return Collections.emptyList();
         }
     }
+    
+    public Album getAlbumDetailById(String spotifyId) {
+        String accessToken = getAccessToken();
+        String url = "https://api.spotify.com/v1/albums/" + spotifyId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity, String.class
+        );
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode item = mapper.readTree(response.getBody());
+
+            Album album = new Album();
+            album.setSpotifyId(item.path("id").asText());
+            album.setTitle(item.path("name").asText());
+            album.setArtist(item.path("artists").get(0).path("name").asText());
+            album.setCoverImgUrl(item.path("images").get(0).path("url").asText());
+            album.setReleaseDate(item.path("release_date").asText());
+            album.setSpotifyUrl(item.path("external_urls").path("spotify").asText());
+            album.setGenre("Unknown");
+
+            return album;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 
 }

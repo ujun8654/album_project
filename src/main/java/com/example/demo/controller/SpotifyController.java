@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.dto.Album;
@@ -31,8 +32,6 @@ public class SpotifyController {
         return "usr/album/albums";
     }
     
-    
-    
     @GetMapping("/albums/search")
     public String searchAlbums(@RequestParam("keyword") String keyword,
                                @RequestParam("type") String type,
@@ -43,7 +42,12 @@ public class SpotifyController {
         return "usr/album/albums";
     }
 
-
+    @GetMapping("/albums/{spotifyId}")
+    public String showAlbumDetail(@PathVariable String spotifyId, Model model) {
+        Album album = spotifyService.getAlbumDetailById(spotifyId);
+        model.addAttribute("album", album);
+        return "usr/album/detail";
+    }
 
 
     

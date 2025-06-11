@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.dto.Album;
 import com.example.demo.dto.UserAlbumRating;
 import com.example.demo.service.AlbumService;
+import com.example.demo.service.SpotifyService;
+
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -49,4 +51,5 @@ public class UsrAlbumController {
         albumService.addAlbum(album);
         return "redirect:/usr/album/list";
     }
+    
 }
