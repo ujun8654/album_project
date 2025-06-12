@@ -8,8 +8,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.demo.dto.Album;
+import com.example.demo.dto.Track;
 import com.example.demo.service.SpotifyService;
 
 @Controller
@@ -44,10 +46,23 @@ public class SpotifyController {
 
     @GetMapping("/albums/{spotifyId}")
     public String showAlbumDetail(@PathVariable String spotifyId, Model model) {
-        Album album = spotifyService.getAlbumDetailById(spotifyId);
-        model.addAttribute("album", album);
+        Album album = spotifyService.getAlbumDetailById(spotifyId); // 이미 있음
+        List<Track> tracks = spotifyService.getTracksByAlbumId(spotifyId); // 트랙 추가
+        album.setTracks(tracks); // 앨범에 트랙 넣기
+        model.addAttribute("album", album); // 모델에 앨범 + 트랙 포함된 상태로 넘김
         return "usr/album/detail";
     }
+
+
+
+
+    
+
+
+    
+
+
+
 
 
     

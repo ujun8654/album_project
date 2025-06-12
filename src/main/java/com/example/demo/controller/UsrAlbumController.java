@@ -19,6 +19,7 @@ import java.util.List;
 public class UsrAlbumController {
 
     private final AlbumService albumService;
+    private final SpotifyService spotifyService;
 
     @GetMapping("/list")
     public String showList(Model model) {
@@ -51,5 +52,14 @@ public class UsrAlbumController {
         albumService.addAlbum(album);
         return "redirect:/usr/album/list";
     }
+    
+    @GetMapping("/spotify/{spotifyId}")
+    public String showDetailBySpotifyId(@PathVariable String spotifyId, Model model) {
+        Album album = spotifyService.getAlbumDetail(spotifyId);  // ✅ 여기서 API로 가져옴
+        album.setTracks(spotifyService.getTracksByAlbumId(spotifyId));  // ✅ 트랙도 여기서
+        model.addAttribute("album", album);
+        return "usr/album/detail";
+    }
+
     
 }

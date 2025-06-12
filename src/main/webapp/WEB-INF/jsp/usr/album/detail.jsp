@@ -4,9 +4,19 @@
 <div style="padding: 40px;">
   <h1>${album.title}</h1>
   <h3>by ${album.artist}</h3>
-  <img src="${album.coverImgUrl}" alt="cover" style="width:300px;">
   <p>발매일: ${album.releaseDate}</p>
-  <a href="${album.spotifyUrl}" target="_blank">Spotify에서 보기</a>
+
+  <img src="${album.coverImgUrl}" alt="cover" style="width:300px; margin: 20px 0;">
+
+
+	<h3>트랙 리스트</h3>
+
+	<c:forEach var="track" items="${album.tracks}">
+		<li>${track.name}(${track.duration})</li>
+	</c:forEach>
+
+
+
 </div>
 
 <%@ include file="/WEB-INF/jsp/common/footer.jsp" %>

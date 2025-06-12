@@ -44,22 +44,59 @@ public class UsrMemberController {
 	}
 
 	@PostMapping("/doJoin")
-	public String doJoin(String loginId, String loginPw, String email, String emailCode, HttpSession session, Model model) {
+	public String doJoin(String loginId, String loginPw, String loginPwConfirm, String email, String emailCode, HttpSession session, Model model) {
+	    boolean hasError = false;
+
+	    if (loginId == null || loginId.trim().isEmpty()) {
+	        model.addAttribute("loginIdError", "아이디를 입력해주세요.");
+	        hasError = true;
+	    }
+
+	    if (loginPw == null || loginPw.trim().isEmpty()) {
+	        model.addAttribute("loginPwError", "비밀번호를 입력해주세요.");
+	        hasError = true;
+	    }
+
+	    if (loginPwConfirm == null || !loginPw.equals(loginPwConfirm)) {
+	        model.addAttribute("loginPwConfirmError", "비밀번호가 일치하지 않습니다.");
+	        hasError = true;
+	    }
+
+	    if (email == null || email.trim().isEmpty()) {
+	        model.addAttribute("emailError", "이메일을 입력해주세요.");
+	        hasError = true;
+	    }
+
+	    if (emailCode == null || emailCode.trim().isEmpty()) {
+	        model.addAttribute("emailCodeError", "인증코드를 입력해주세요.");
+	        hasError = true;
+	    }
+
+	    if (hasError) {
+	        model.addAttribute("loginId", loginId);
+	        model.addAttribute("email", email);
+	        return "usr/member/join";
+	    }
+
 	    String sessionCode = (String) session.getAttribute("emailAuthCode");
 	    String sessionEmail = (String) session.getAttribute("emailAuthTarget");
 
 	    if (sessionCode == null || sessionEmail == null || !sessionEmail.equals(email) || !sessionCode.equals(emailCode)) {
-	        model.addAttribute("errorMsg", "이메일 인증코드가 일치하지 않습니다.");
+	        model.addAttribute("emailCodeError", "이메일 인증코드가 일치하지 않습니다.");
+	        model.addAttribute("loginId", loginId);
+	        model.addAttribute("email", email);
 	        return "usr/member/join";
 	    }
 
 	    if (memberService.getMemberByLoginId(loginId) != null) {
-	        model.addAttribute("errorMsg", "이미 사용 중인 아이디입니다.");
+	        model.addAttribute("loginIdError", "이미 사용 중인 아이디입니다.");
+	        model.addAttribute("email", email);
 	        return "usr/member/join";
 	    }
 
 	    if (memberService.getMemberByEmail(email) != null) {
-	        model.addAttribute("errorMsg", "이미 사용 중인 이메일입니다.");
+	        model.addAttribute("emailError", "이미 사용 중인 이메일입니다.");
+	        model.addAttribute("loginId", loginId);
 	        return "usr/member/join";
 	    }
 
@@ -71,6 +108,8 @@ public class UsrMemberController {
 
 	    return "redirect:/usr/member/login";
 	}
+
+
 
 
 
@@ -95,8 +134,6 @@ public class UsrMemberController {
 	@ResponseBody
 	public ResultData loginIdDupChk(String loginId) {
 		Member member = this.memberService.getMemberByLoginId(loginId);
-		System.out.println("서버에서 받은 loginId: " + loginId);
-
 
 		if (member != null) {
 			return ResultData.from("F-1", String.format("[ %s ] 은(는) 이미 사용중인 아이디입니다", loginId));
@@ -136,4 +173,6 @@ public class UsrMemberController {
 	public String getLoginId() {
 		return this.memberService.getLoginId(this.req.getLoginedMember().getId());
 	}
+	
+	
 }
