@@ -7,6 +7,8 @@ import com.example.demo.service.SpotifyService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,14 +36,6 @@ public class UsrAlbumController {
         return "album/detail";
     }
 
-    @PostMapping("/rate")
-    public String addRating(@ModelAttribute UserAlbumRating rating, HttpSession session) {
-        int memberId = (int) session.getAttribute("loginedMemberId");
-        rating.setMemberId(memberId);
-        albumService.addRating(rating);
-        return "redirect:/usr/album/detail?id=" + rating.getAlbumId();
-    }
-
     @GetMapping("/add")
     public String showAddForm() {
         return "album/add";
@@ -55,11 +49,28 @@ public class UsrAlbumController {
     
     @GetMapping("/spotify/{spotifyId}")
     public String showDetailBySpotifyId(@PathVariable String spotifyId, Model model) {
-        Album album = spotifyService.getAlbumDetail(spotifyId);  // ✅ 여기서 API로 가져옴
-        album.setTracks(spotifyService.getTracksByAlbumId(spotifyId));  // ✅ 트랙도 여기서
+        Album album = spotifyService.getAlbumDetail(spotifyId);  
+        album.setTracks(spotifyService.getTracksByAlbumId(spotifyId));
         model.addAttribute("album", album);
         return "usr/album/detail";
     }
+    
+
+        
+
+	@PostMapping("/rate")
+	@ResponseBody
+	public ResponseEntity<?> saveRating(@RequestBody UserAlbumRating rating, HttpSession session) {
+		Integer memberId = (Integer) session.getAttribute("loginedMemberId");
+		if (memberId == null)
+			return ResponseEntity.status(401).build();
+
+		rating.setMemberId(memberId);
+		albumService.addRating(rating);
+		return ResponseEntity.ok().build();
+	}
+
+
 
     
 }

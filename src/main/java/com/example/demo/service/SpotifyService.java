@@ -405,10 +405,6 @@ public class SpotifyService {
                 result.add(track);
             }
 
-            // ✅ 트랙 수 출력
-            System.out.println("트랙 개수: " + result.size());
-        } else {
-            System.out.println("Spotify API 실패: " + response.getStatusCode());
         }
 
         return result;
