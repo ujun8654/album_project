@@ -106,7 +106,6 @@
   fill: #f5c518;
 }
 
-/* 취소하기 말풍선 */
 .cancel-tooltip {
   position: absolute;
   background: #fff;
@@ -132,8 +131,7 @@
     <p>발매일: ${album.releaseDate}</p>
     <a href="${album.spotifyUrl}" target="_blank">Spotify에서 보기</a>
 
-    <!-- 별점 영역 -->
-    <div class="star-wrap" data-album-id="${album.id}" data-user-logged-in="${not empty req.loginedMember}">
+    <div class="star-wrap" data-album-id="${album.spotifyId}" data-user-logged-in="${not empty req.loginedMember}">
       <c:forEach begin="1" end="5" var="i">
         <div class="star-box" data-index="${i}">
           <div class="star-fill">
@@ -197,7 +195,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const hoveredRating = Math.round(rawRating * 2) / 2;
     setRating(hoveredRating);
 
-    // 현재 점수와 같으면 "취소하기" 표시
     if (hoveredRating === currentRating && currentRating > 0) {
       const box = starBoxes[Math.floor(currentRating) - 1];
       const boxRect = box.getBoundingClientRect();
@@ -224,13 +221,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const widthPerStar = rect.width / 5;
     const clickedRating = Math.round(offsetX / widthPerStar * 2) / 2;
 
-    // 클릭한 점수가 현재 점수와 같으면 취소
     if (clickedRating === currentRating) {
       currentRating = 0;
       setRating(0);
       tooltip.style.display = "none";
 
-      fetch(`/albums/${wrap.dataset.albumId}/rate`, {
+      fetch("http://localhost:8080/usr/album/albums/" + wrap.dataset.albumId + "/rate", {
+
+
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "rating=0"
@@ -245,7 +243,9 @@ document.addEventListener("DOMContentLoaded", () => {
     currentRating = clickedRating;
     setRating(currentRating);
 
-    fetch(`/albums/${wrap.dataset.albumId}/rate`, {
+    fetch("http://localhost:8080/usr/album/albums/" + wrap.dataset.albumId + "/rate", {
+
+
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: "rating=" + currentRating
@@ -256,3 +256,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+
+
+
+
+
+
+

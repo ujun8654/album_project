@@ -8,5 +8,5 @@ public class UserAlbumRating {
     private String regDate;
     private int memberId;
     private String albumId;
-    private int rating;
+    private double rating;
 }

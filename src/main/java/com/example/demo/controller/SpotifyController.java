@@ -30,10 +30,9 @@ public class SpotifyController {
         model.addAttribute("hiphopAlbums", hiphopAlbums);
         model.addAttribute("rnbAlbums", rnbAlbums);
 
-
         return "usr/album/albums";
     }
-    
+
     @GetMapping("/albums/search")
     public String searchAlbums(@RequestParam("keyword") String keyword,
                                @RequestParam("type") String type,
@@ -46,25 +45,10 @@ public class SpotifyController {
 
     @GetMapping("/albums/{spotifyId}")
     public String showAlbumDetail(@PathVariable String spotifyId, Model model) {
-        Album album = spotifyService.getAlbumDetailById(spotifyId); // 이미 있음
-        List<Track> tracks = spotifyService.getTracksByAlbumId(spotifyId); // 트랙 추가
-        album.setTracks(tracks); // 앨범에 트랙 넣기
-        model.addAttribute("album", album); // 모델에 앨범 + 트랙 포함된 상태로 넘김
+        Album album = spotifyService.getAlbumDetailById(spotifyId);
+        List<Track> tracks = spotifyService.getTracksByAlbumId(spotifyId);
+        album.setTracks(tracks);
+        model.addAttribute("album", album);
         return "usr/album/detail";
     }
-
-
-
-
-    
-
-
-    
-
-
-
-
-
-    
-    
 }
