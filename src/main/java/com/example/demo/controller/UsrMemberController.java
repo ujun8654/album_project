@@ -21,6 +21,7 @@ import com.example.demo.dto.ResultData;
 import com.example.demo.service.MemberService;
 import com.example.demo.util.Util;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -143,30 +144,51 @@ public class UsrMemberController {
 	}
 
 	@GetMapping("/login")
-	public String login() {
-		return "usr/member/login";
+	public String login(HttpSession session, HttpServletRequest request) {
+	    String referer = request.getHeader("Referer");
+	    if (referer != null && !referer.contains("/login")) {
+	        session.setAttribute("redirectAfterLogin", referer);
+	    }
+	    return "usr/member/login";
 	}
+
+
 
 	@PostMapping("/doLogin")
-	public String doLogin(String loginId, String loginPw, Model model) {
-		Member member = memberService.getMemberByLoginId(loginId);
+	public String doLogin(String loginId, String loginPw, Model model, HttpSession session) {
+	    Member member = memberService.getMemberByLoginId(loginId);
 
-		if (member == null || !member.getLoginPw().equals(Util.encryptSHA256(loginPw))) {
-			model.addAttribute("errorMsg", "아이디 또는 비밀번호가 잘못되었습니다.");
-			return "usr/member/login";
-		}
+	    if (member == null || !member.getLoginPw().equals(Util.encryptSHA256(loginPw))) {
+	        model.addAttribute("errorMsg", "아이디 또는 비밀번호가 잘못되었습니다.");
+	        return "usr/member/login";
+	    }
 
-		req.login(new LoginedMember(member.getId(), member.getAuthLevel()));
-		return "redirect:/";
+	    req.login(new LoginedMember(member.getId(), member.getAuthLevel()));
+
+	    String redirectUri = (String) session.getAttribute("redirectAfterLogin");
+	    if (redirectUri != null) {
+	        session.removeAttribute("redirectAfterLogin");
+	        return "redirect:" + redirectUri;
+	    }
+
+	    return "redirect:/";
 	}
+
  
 
 	@GetMapping("/logout")
-	@ResponseBody
-	public String logout() {
-		req.logout();
-		return Util.jsReplaceGo("/");
+	public String logout(HttpSession session, HttpServletRequest request) {
+	    String referer = request.getHeader("Referer");
+
+	    session.invalidate();
+
+	    if (referer != null && !referer.contains("/logout")) {
+	        return "redirect:" + referer;
+	    }
+
+	    return "redirect:/usr/home/main";
 	}
+
 
 	@GetMapping("/getLoginId")
 	@ResponseBody
