@@ -13,4 +13,18 @@ CREATE TABLE `member`(
 
 SELECT * FROM `member`;
 
- 
+
+
+
+CREATE TABLE user_album_rating (
+  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
+  , regDate DATETIME NOT NULL DEFAULT NOW()
+  , memberId INT UNSIGNED NOT NULL 
+  , albumId VARCHAR(500) NOT NULL
+  , rating DOUBLE NOT NULL
+  , UNIQUE KEY uq_member_album (memberId, albumId)
+  , FOREIGN KEY (memberId) REFERENCES `member`(id) ON DELETE CASCADE
+);
+
+SELECT * FROM user_album_rating;
+

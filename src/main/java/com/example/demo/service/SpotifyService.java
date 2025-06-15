@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.Album;
+import com.example.demo.dto.Track;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -371,6 +372,87 @@ public class SpotifyService {
             return null;
         }
     }
+    
+    public List<Track> getTracksByAlbumId(String albumId) {
+        String url = "https://api.spotify.com/v1/albums/" + albumId + "/tracks";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(getAccessToken());
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            entity,
+            Map.class
+        );
+
+        List<Track> result = new ArrayList<>();
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            List<Map<String, Object>> items = (List<Map<String, Object>>) response.getBody().get("items");
+
+            for (Map<String, Object> item : items) {
+                Track track = new Track();
+                track.setName((String) item.get("name"));
+
+                int durationMs = (int) item.get("duration_ms");
+                int min = durationMs / 60000;
+                int sec = (durationMs % 60000) / 1000;
+                String duration = String.format("%d:%02d", min, sec);
+
+                track.setDuration(duration);
+                result.add(track);
+            }
+
+        }
+
+        return result;
+    }
+
+    public Album getAlbumDetail(String spotifyId) {
+        String url = "https://api.spotify.com/v1/albums/" + spotifyId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(getAccessToken());
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            entity,
+            Map.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("앨범 정보 가져오기 실패");
+        }
+
+        Map<String, Object> body = response.getBody();
+
+        Album album = new Album();
+        album.setSpotifyId(spotifyId);
+        album.setTitle((String) body.get("name"));
+
+        List<Map<String, Object>> artists = (List<Map<String, Object>>) body.get("artists");
+        if (!artists.isEmpty()) {
+            album.setArtist((String) artists.get(0).get("name"));
+        }
+
+        album.setReleaseDate((String) body.get("release_date"));
+        album.setCoverImgUrl((String) ((Map<String, Object>) ((List<?>) body.get("images")).get(0)).get("url"));
+        album.setSpotifyUrl((String) body.get("external_urls") != null
+            ? (String) ((Map<String, Object>) body.get("external_urls")).get("spotify")
+            : null);
+
+        return album;
+    }
+
+
+
+
+
+    
 
 
 

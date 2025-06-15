@@ -21,6 +21,7 @@ import com.example.demo.dto.ResultData;
 import com.example.demo.service.MemberService;
 import com.example.demo.util.Util;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -44,22 +45,59 @@ public class UsrMemberController {
 	}
 
 	@PostMapping("/doJoin")
-	public String doJoin(String loginId, String loginPw, String email, String emailCode, HttpSession session, Model model) {
+	public String doJoin(String loginId, String loginPw, String loginPwConfirm, String email, String emailCode, HttpSession session, Model model) {
+	    boolean hasError = false;
+
+	    if (loginId == null || loginId.trim().isEmpty()) {
+	        model.addAttribute("loginIdError", "아이디를 입력해주세요.");
+	        hasError = true;
+	    }
+
+	    if (loginPw == null || loginPw.trim().isEmpty()) {
+	        model.addAttribute("loginPwError", "비밀번호를 입력해주세요.");
+	        hasError = true;
+	    }
+
+	    if (loginPwConfirm == null || !loginPw.equals(loginPwConfirm)) {
+	        model.addAttribute("loginPwConfirmError", "비밀번호가 일치하지 않습니다.");
+	        hasError = true;
+	    }
+
+	    if (email == null || email.trim().isEmpty()) {
+	        model.addAttribute("emailError", "이메일을 입력해주세요.");
+	        hasError = true;
+	    }
+
+	    if (emailCode == null || emailCode.trim().isEmpty()) {
+	        model.addAttribute("emailCodeError", "인증코드를 입력해주세요.");
+	        hasError = true;
+	    }
+
+	    if (hasError) {
+	        model.addAttribute("loginId", loginId);
+	        model.addAttribute("email", email);
+	        return "usr/member/join";
+	    }
+
 	    String sessionCode = (String) session.getAttribute("emailAuthCode");
 	    String sessionEmail = (String) session.getAttribute("emailAuthTarget");
 
 	    if (sessionCode == null || sessionEmail == null || !sessionEmail.equals(email) || !sessionCode.equals(emailCode)) {
-	        model.addAttribute("errorMsg", "이메일 인증코드가 일치하지 않습니다.");
+	        model.addAttribute("emailCodeError", "이메일 인증코드가 일치하지 않습니다.");
+	        model.addAttribute("loginId", loginId);
+	        model.addAttribute("email", email);
 	        return "usr/member/join";
 	    }
 
 	    if (memberService.getMemberByLoginId(loginId) != null) {
-	        model.addAttribute("errorMsg", "이미 사용 중인 아이디입니다.");
+	        model.addAttribute("loginIdError", "이미 사용 중인 아이디입니다.");
+	        model.addAttribute("email", email);
 	        return "usr/member/join";
 	    }
 
 	    if (memberService.getMemberByEmail(email) != null) {
-	        model.addAttribute("errorMsg", "이미 사용 중인 이메일입니다.");
+	        model.addAttribute("emailError", "이미 사용 중인 이메일입니다.");
+	        model.addAttribute("loginId", loginId);
 	        return "usr/member/join";
 	    }
 
@@ -71,6 +109,8 @@ public class UsrMemberController {
 
 	    return "redirect:/usr/member/login";
 	}
+
+
 
 
 
@@ -95,8 +135,6 @@ public class UsrMemberController {
 	@ResponseBody
 	public ResultData loginIdDupChk(String loginId) {
 		Member member = this.memberService.getMemberByLoginId(loginId);
-		System.out.println("서버에서 받은 loginId: " + loginId);
-
 
 		if (member != null) {
 			return ResultData.from("F-1", String.format("[ %s ] 은(는) 이미 사용중인 아이디입니다", loginId));
@@ -106,34 +144,57 @@ public class UsrMemberController {
 	}
 
 	@GetMapping("/login")
-	public String login() {
-		return "usr/member/login";
+	public String login(HttpSession session, HttpServletRequest request) {
+	    String referer = request.getHeader("Referer");
+	    if (referer != null && !referer.contains("/login")) {
+	        session.setAttribute("redirectAfterLogin", referer);
+	    }
+	    return "usr/member/login";
 	}
+
+
 
 	@PostMapping("/doLogin")
-	public String doLogin(String loginId, String loginPw, Model model) {
-		Member member = memberService.getMemberByLoginId(loginId);
+	public String doLogin(String loginId, String loginPw, Model model, HttpSession session) {
+	    Member member = memberService.getMemberByLoginId(loginId);
 
-		if (member == null || !member.getLoginPw().equals(Util.encryptSHA256(loginPw))) {
-			model.addAttribute("errorMsg", "아이디 또는 비밀번호가 잘못되었습니다.");
-			return "usr/member/login";
-		}
+	    if (member == null || !member.getLoginPw().equals(Util.encryptSHA256(loginPw))) {
+	        model.addAttribute("errorMsg", "아이디 또는 비밀번호가 잘못되었습니다.");
+	        return "usr/member/login";
+	    }
 
-		req.login(new LoginedMember(member.getId(), member.getAuthLevel()));
-		return "redirect:/";
+	    req.login(new LoginedMember(member.getId(), member.getAuthLevel()));
+
+	    String redirectUri = (String) session.getAttribute("redirectAfterLogin");
+	    if (redirectUri != null) {
+	        session.removeAttribute("redirectAfterLogin");
+	        return "redirect:" + redirectUri;
+	    }
+
+	    return "redirect:/";
 	}
+
  
 
 	@GetMapping("/logout")
-	@ResponseBody
-	public String logout() {
-		req.logout();
-		return Util.jsReplaceGo("/");
+	public String logout(HttpSession session, HttpServletRequest request) {
+	    String referer = request.getHeader("Referer");
+
+	    session.invalidate();
+
+	    if (referer != null && !referer.contains("/logout")) {
+	        return "redirect:" + referer;
+	    }
+
+	    return "redirect:/usr/home/main";
 	}
+
 
 	@GetMapping("/getLoginId")
 	@ResponseBody
 	public String getLoginId() {
 		return this.memberService.getLoginId(this.req.getLoginedMember().getId());
 	}
+	
+	
 }

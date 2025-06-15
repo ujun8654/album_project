@@ -1,55 +1,53 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.Album;
-import com.example.demo.dto.UserAlbumRating;
-import com.example.demo.service.AlbumService;
-import com.example.demo.service.SpotifyService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.example.demo.dto.LoginedMember;
+import com.example.demo.dto.ResultData;
+import com.example.demo.service.UserAlbumRatingService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/usr/album")
 public class UsrAlbumController {
 
-    private final AlbumService albumService;
+    private final UserAlbumRatingService userAlbumRatingService;
 
-    @GetMapping("/list")
-    public String showList(Model model) {
-        model.addAttribute("albums", albumService.getAllAlbums());
-        return "album/list";
-    }
+    @PostMapping("/albums/{albumId}/rate")
+    @ResponseBody
+    public ResultData rateAlbum(@PathVariable String albumId, @RequestParam double rating, HttpSession session) {
+        LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
+//디버깅
+//        System.out.println("albumId = " + albumId);
+//        System.out.println("rating = " + rating);
 
-    @GetMapping("/detail")
-    public String showDetail(@RequestParam int id, Model model) {
-        model.addAttribute("album", albumService.getAlbumById(id));
-        model.addAttribute("ratings", albumService.getRatingsByAlbumId(id));
-        return "album/detail";
-    }
+        if (loginedMember == null) {
+            return ResultData.from("F-AUTH", "로그인이 필요합니다.");
+        }
 
-    @PostMapping("/rate")
-    public String addRating(@ModelAttribute UserAlbumRating rating, HttpSession session) {
-        int memberId = (int) session.getAttribute("loginedMemberId");
-        rating.setMemberId(memberId);
-        albumService.addRating(rating);
-        return "redirect:/usr/album/detail?id=" + rating.getAlbumId();
-    }
+        int memberId = loginedMember.getId();
+        userAlbumRatingService.saveOrUpdate(memberId, albumId, rating);
 
-    @GetMapping("/add")
-    public String showAddForm() {
-        return "album/add";
-    }
-
-    @PostMapping("/add")
-    public String addAlbum(@ModelAttribute Album album) {
-        albumService.addAlbum(album);
-        return "redirect:/usr/album/list";
+        return ResultData.from("S-1", "평점이 저장되었습니다.");
     }
     
+
+
+
+
 }
+
+
+
+
+    
