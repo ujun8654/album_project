@@ -31,5 +31,23 @@ public class MemberService {
 	public String getLoginId(int id) {
 		return this.memberDao.getLoginId(id);
 	}
+	
+	public void updateSpotifyConnected(int memberId) {
+	    memberDao.updateSpotifyConnected(memberId);
+	}
+	
+	public void disconnectSpotify(int memberId) {
+	    memberDao.disconnectSpotify(memberId);
+	}
+	
+	public void updateSpotifyProfileUrl(int memberId, String profileUrl) {
+	    memberDao.updateSpotifyProfileUrl(memberId, profileUrl);
+	}
+	
+	
+
+	
+
+
 
 }

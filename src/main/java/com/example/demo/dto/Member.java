@@ -14,4 +14,17 @@ public class Member {
 	private String loginId;
 	private String loginPw;
 	private int authLevel;
+	private boolean isSpotifyConnected;
+	private String spotifyProfileUrl;
+
+	public String getSpotifyProfileUrl() {
+	    return spotifyProfileUrl;
+	}
+	
+	public boolean isSpotifyConnected() {
+	    return isSpotifyConnected;
+	}
+	
+	
+
 }

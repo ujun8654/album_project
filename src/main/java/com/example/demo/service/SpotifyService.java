@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,6 +24,10 @@ public class SpotifyService {
 
     @Value("${spotify.client-secret}")
     private String clientSecret;
+
+    @Value("${spotify.redirect-uri}")
+    private String redirectUri;
+
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -447,6 +453,57 @@ public class SpotifyService {
 
         return album;
     }
+    
+    public List<String> getRecentlyPlayed(String accessToken) {
+        String url = "https://api.spotify.com/v1/me/player/recently-played?limit=10";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.GET, entity, String.class);
+
+        return List.of(response.getBody()); 
+    }
+
+    public String exchangeCodeForAccessToken(String code) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(clientId, clientSecret);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("code", code);
+        params.add("redirect_uri", redirectUri); 
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity("https://accounts.spotify.com/api/token", request, Map.class);
+        return (String) response.getBody().get("access_token");
+    }
+
+    public String getSpotifyUserProfileUrl(String accessToken) {
+        String endpoint = "https://api.spotify.com/v1/me";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+            endpoint, HttpMethod.GET, entity, Map.class
+        );
+
+        Map<String, Object> body = response.getBody();
+        if (body != null && body.containsKey("external_urls")) {
+            Map<String, String> urls = (Map<String, String>) body.get("external_urls");
+            return urls.get("spotify"); // ✅ 프로필 URL 반환
+        }
+
+        return null;
+    }
+
 
 
 

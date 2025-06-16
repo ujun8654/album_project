@@ -74,52 +74,60 @@
   .slider-btn.right {
     right: -40px;
   }
+  
+.search-header-bar {
+  height: 45px;
+  display: flex;
+  align-items: center;
+  padding-left: 265px;
+  background-color: #f4f4f4;
+  font-size: 18px;
+  font-weight: 500;
+  color: #666;
+  box-sizing: border-box;
+  border-top: 1px solid #ddd;
+  font-weight: bold;
+  
+}
+
+  
 </style>
 
-<div style="padding: 20px 60px;">
-  <c:if test="${not empty keyword}">
-    <h3 style="font-size: 16px; margin-bottom: 20px;">
-      "<span style="color: #222; font-weight: bold;">${keyword}</span>" 검색결과
-    </h3>
-  </c:if>
-  <form action="/albums/search" method="get" style="display: flex; gap: 10px; margin-bottom: 20px;">
-    <select name="type" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-      <option value="artist" <c:if test="${type == 'artist'}">selected</c:if>>아티스트</option>
-      <option value="album" <c:if test="${type == 'album'}">selected</c:if>>제목</option>
-    </select>
-    <input type="text" name="keyword" placeholder="검색어 입력" value="${keyword}"
-           style="width: 300px; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" />
-    <button type="submit"
-            style="padding: 8px 16px; border: none; background-color: black; color: white; border-radius: 4px;">
-      검색
-    </button>
-  </form>
+<div>
+<c:if test="${not empty keyword}">
+  <div class="search-header-bar">
+    “<span>${fn:escapeXml(keyword)}</span>” 검색결과
+  </div>
+</c:if>
+
+
 </div>
 
 <c:if test="${not empty keyword}">
-  <div style="padding: 40px 60px 0 60px;">
-	<div class="album-list" id="albumList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-	  <c:forEach var="album" items="${albums}">
-	    <a href="/albums/${album.spotifyId}" style="text-decoration: none; color: inherit;">
-	      <div class="album-item" style="display: flex; align-items: flex-start; gap: 12px;">
-	        <img src="${album.coverImgUrl}" alt="Album Cover"
-	             style="height: 90px; border-radius: 6px; object-fit: cover;" />
-	        <div class="album-info">
-	          <div class="album-title" style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">
-	            ${album.title}
-	          </div>
-	          <div class="album-release" style="font-size: 11px; color: #999; margin-bottom: 4px;">
-	            ${album.releaseDate}
-	          </div>
-	          <div class="album-artist" style="font-size: 11px; color: #666;">
-	            ${album.artist}
-	          </div>
-	        </div>
-	      </div>
-	    </a>
-	  </c:forEach>
-	</div>
+  <div style="padding: 40px 60px 0 265px;">
 
+    <div class="album-list" id="albumList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <c:forEach var="album" items="${albums}">
+        <a href="/albums/${album.spotifyId}" style="text-decoration: none; color: inherit;">
+          <div class="album-item" style="display: flex; align-items: flex-start; gap: 12px;">
+            <img src="${album.coverImgUrl}" alt="Album Cover"
+                 style="height: 90px; border-radius: 6px; object-fit: cover;" />
+            <div class="album-info">
+              <div class="album-title" style="font-size: 13px; font-weight: bold; margin-bottom: 4px;">
+                ${album.title}
+              </div>
+              <div class="album-release" style="font-size: 11px; color: #999; margin-bottom: 4px;">
+                ${album.releaseDate}
+              </div>
+              <div class="album-artist" style="font-size: 11px; color: #666;">
+                ${album.artist}
+              </div>
+            </div>
+          </div>
+        </a>
+      </c:forEach>
+    </div>
+  </div>
 </c:if>
 
 <c:if test="${empty keyword}">
@@ -131,7 +139,7 @@
         <div class="album-slider">
           <c:forEach var="album" items="${newReleases}">
             <a href="/albums/${album.spotifyId}" class="album-card">
-              <img src="${album.coverImgUrl}" alt="Cover">
+              <img src="${album.coverImgUrl}" alt="Cover" />
               <div class="album-title">${album.title}</div>
               <div class="album-artist">${album.artist}</div>
             </a>
@@ -150,7 +158,7 @@
         <div class="album-slider">
           <c:forEach var="album" items="${hiphopAlbums}">
             <a href="/albums/${album.spotifyId}" class="album-card">
-              <img src="${album.coverImgUrl}" alt="Cover">
+              <img src="${album.coverImgUrl}" alt="Cover" />
               <div class="album-title">${album.title}</div>
               <div class="album-artist">${album.artist}</div>
             </a>
@@ -169,7 +177,7 @@
         <div class="album-slider">
           <c:forEach var="album" items="${rnbAlbums}">
             <a href="/albums/${album.spotifyId}" class="album-card">
-              <img src="${album.coverImgUrl}" alt="Cover">
+              <img src="${album.coverImgUrl}" alt="Cover" />
               <div class="album-title">${album.title}</div>
               <div class="album-artist">${album.artist}</div>
             </a>
@@ -189,8 +197,5 @@ function scrollSlider(button, direction) {
   slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
 }
 </script>
-
-
-
 
 <%@ include file="/WEB-INF/jsp/common/footer.jsp" %>

@@ -16,6 +16,11 @@
   </div>
 </div>
 
+<form method="get" action="/spotify/disconnect">
+  <button type="submit">연결 해제</button>
+</form>
+
+
 <%@ include file="/WEB-INF/jsp/common/footer.jsp" %>
 
 

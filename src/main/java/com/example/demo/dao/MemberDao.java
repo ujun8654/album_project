@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.example.demo.dto.Member;
 
@@ -21,11 +22,15 @@ public interface MemberDao {
 	void joinMember(@Param("loginId") String loginId, @Param("loginPw") String loginPw, @Param("email") String email);
 
 	@Select("""
-		SELECT *
-		FROM `member`
-		WHERE loginId = #{loginId}
+		    SELECT id, regDate, updateDate, loginId, loginPw, 
+		           is_spotify_connected AS isSpotifyConnected,
+		           spotify_profile_url AS spotifyProfileUrl
+		    FROM member
+		    WHERE loginId = #{loginId}
 		""")
+
 	Member getMemberByLoginId(String loginId);
+
 
 	@Select("""
 		SELECT loginId
@@ -40,4 +45,23 @@ public interface MemberDao {
 		WHERE email = #{email}
 		""")
 	Member getMemberByEmail(String email);
+	
+	@Update("UPDATE member SET is_spotify_connected = TRUE WHERE id = #{id}")
+	void updateSpotifyConnected(@Param("id") int id);
+
+	@Update("UPDATE member SET is_spotify_connected = false, updateDate = NOW() WHERE id = #{memberId}")
+	void disconnectSpotify(@Param("memberId") int memberId);
+
+	@Update("UPDATE member SET spotify_profile_url = #{profileUrl}, updateDate = NOW() WHERE id = #{id}")
+	void updateSpotifyProfileUrl(@Param("id") int id, @Param("profileUrl") String profileUrl);
+
+
 }
+
+
+
+
+
+
+
+

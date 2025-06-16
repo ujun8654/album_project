@@ -103,10 +103,17 @@ public class UsrMemberController {
 
 	    String encryptedPw = Util.encryptSHA256(loginPw);
 	    memberService.joinMember(loginId, encryptedPw, email);
-
+	    
 	    session.removeAttribute("emailAuthCode");
 	    session.removeAttribute("emailAuthTarget");
+//디버깅
+	    //System.out.println("✅ 회원가입 후 로그아웃 직전 ID: " + req.getLoginedMember().getId());
 
+	    req.logout();
+
+	    //System.out.println("✅ 로그아웃 후 ID: " + req.getLoginedMember().getId());
+
+	    
 	    return "redirect:/usr/member/login";
 	}
 
@@ -146,11 +153,14 @@ public class UsrMemberController {
 	@GetMapping("/login")
 	public String login(HttpSession session, HttpServletRequest request) {
 	    String referer = request.getHeader("Referer");
-	    if (referer != null && !referer.contains("/login")) {
+
+	    if (referer != null && !referer.contains("/login") && !referer.contains("/join")) {
 	        session.setAttribute("redirectAfterLogin", referer);
 	    }
+
 	    return "usr/member/login";
 	}
+
 
 
 
@@ -165,6 +175,14 @@ public class UsrMemberController {
 
 	    req.login(new LoginedMember(member.getId(), member.getAuthLevel()));
 
+	    // ✅ 스포티파이 연동 여부 세션 저장
+	    session.setAttribute("isSpotifyConnected", member.isSpotifyConnected());
+
+	    // ✅ 프로필 URL 세션 저장
+	    if (member.getSpotifyProfileUrl() != null) {
+	        session.setAttribute("spotifyProfileUrl", member.getSpotifyProfileUrl());
+	    }
+
 	    String redirectUri = (String) session.getAttribute("redirectAfterLogin");
 	    if (redirectUri != null) {
 	        session.removeAttribute("redirectAfterLogin");
@@ -173,6 +191,8 @@ public class UsrMemberController {
 
 	    return "redirect:/";
 	}
+
+
 
  
 

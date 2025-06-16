@@ -31,4 +31,5 @@ spring:
 spotify:
   client-id: a23bd61419a640d9bd60b9e86005eb74
   client-secret: 9bd8156f80624dc2896bdbde0b233c69
+  redirect-uri: http://127.0.0.1:8080/spotify/callback 
 #unknown property 'spotify' [YAML_UNKNOWN_PROPERTY]

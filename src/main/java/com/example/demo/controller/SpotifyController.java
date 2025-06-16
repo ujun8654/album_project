@@ -1,20 +1,25 @@
 package com.example.demo.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.demo.dto.Album;
 import com.example.demo.dto.LoginedMember;
 import com.example.demo.dto.Track;
+import com.example.demo.service.MemberService;
+import com.example.demo.service.SpotifyAuthService;
 import com.example.demo.service.SpotifyService;
 import com.example.demo.service.UserAlbumRatingService;
+import com.example.demo.service.WantAlbumService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -23,10 +28,16 @@ public class SpotifyController {
 	
     private final SpotifyService spotifyService;
     private final UserAlbumRatingService userAlbumRatingService;
+    private final WantAlbumService wantAlbumService;
+    private final SpotifyAuthService spotifyAuthService;
+    private final MemberService memberService;
 
-    public SpotifyController(SpotifyService spotifyService, UserAlbumRatingService userAlbumRatingService) {
+    public SpotifyController(SpotifyService spotifyService, UserAlbumRatingService userAlbumRatingService, WantAlbumService wantAlbumService, SpotifyAuthService spotifyAuthService, MemberService memberService) {
         this.spotifyService = spotifyService;
         this.userAlbumRatingService = userAlbumRatingService;
+        this.wantAlbumService = wantAlbumService;
+        this.spotifyAuthService = spotifyAuthService;
+        this.memberService = memberService;
     }
     @GetMapping("/albums")
     public String showAlbums(Model model) {
@@ -61,18 +72,76 @@ public class SpotifyController {
         LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
 
         double userRating = 0.0;
-        if (loginedMember != null) {
+        boolean isWanted = false;
+
+        if (loginedMember != null && loginedMember.getId() != 0) {
             int memberId = loginedMember.getId();
             userRating = userAlbumRatingService.getUserRating(memberId, albumId);
-        }
-//디버깅
-        //System.out.println("앨범 상세 진입 / 평점 = " + userRating);
 
+            isWanted = wantAlbumService.isWanted(memberId, albumId);
+        }
+
+        Double avgRatingObj = userAlbumRatingService.getAverageRating(albumId);
+        double avgRating = (avgRatingObj != null) ? avgRatingObj : 0.0;
+
+//디버깅
+        // System.out.println("앨범 상세 진입 / 평점 = " + userRating);
+        // System.out.println("평균 평점 확인: " + avgRating);
+        
         model.addAttribute("userRating", userRating);
+        model.addAttribute("avgRating", avgRating);
         model.addAttribute("albumId", albumId);
+        model.addAttribute("isWanted", isWanted); 
 
         return "usr/album/detail";
     }
+
+    
+    @PostMapping("/album/{id}/want-toggle")
+    @ResponseBody
+    public Map<String, Object> toggleWantAlbum(
+            @PathVariable("id") String albumId,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
+
+        if (loginedMember == null || loginedMember.getId() == 0) {
+            result.put("success", false);
+            result.put("msg", "로그인이 필요합니다.");
+            return result;
+        }
+
+        boolean added = wantAlbumService.toggle(loginedMember.getId(), albumId);
+        result.put("success", true);
+        result.put("added", added);
+        return result;
+    }
+
+    @GetMapping("/spotify/login")
+    public String redirectToSpotifyAuth() {
+        return "redirect:" + spotifyAuthService.getAuthorizationUrl();
+    }
+    
+    @GetMapping("/spotify/disconnect")
+    public String disconnectSpotify(HttpSession session) {
+        // 세션에서 연동 정보 삭제
+        session.removeAttribute("spotifyAccessToken");
+        session.removeAttribute("spotifyProfileUrl");
+
+        // ✅ 연동 여부 false로 세션에도 반영
+        session.setAttribute("isSpotifyConnected", false);
+
+        // DB에서도 연동 해제
+        LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
+        if (loginedMember != null) {
+            int memberId = loginedMember.getId();
+            memberService.disconnectSpotify(memberId);
+        }
+
+        return "redirect:/usr/home/main"; // 메인 페이지로 리디렉션
+    }
+
+
 
 
 }

@@ -2,15 +2,16 @@ DROP DATABASE IF EXISTS SB_AM;
 CREATE DATABASE SB_AM;
 USE SB_AM;
 
-CREATE TABLE `member`(
-    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
-    , regDate DATETIME NOT NULL
-    , updateDate DATETIME NOT NULL
-    , loginId VARCHAR(50) NOT NULL UNIQUE
-    , loginPw VARCHAR(100) NOT NULL
-    , email VARCHAR(100) UNIQUE
+CREATE TABLE `member` (
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    regDate DATETIME NOT NULL,
+    updateDate DATETIME NOT NULL,
+    loginId VARCHAR(50) NOT NULL UNIQUE,
+    loginPw VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    is_spotify_connected BOOLEAN NOT NULL DEFAULT FALSE
 );
-
+ALTER TABLE MEMBER ADD COLUMN spotify_profile_url VARCHAR(500);
 SELECT * FROM `member`;
 
 
@@ -27,4 +28,28 @@ CREATE TABLE user_album_rating (
 );
 
 SELECT * FROM user_album_rating;
+
+SELECT albumId, rating FROM user_album_rating ORDER BY id DESC LIMIT 20;
+
+
+CREATE TABLE want_album (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  memberId BIGINT NOT NULL,
+  albumId VARCHAR(100) NOT NULL,
+  regDate DATETIME DEFAULT NOW(),
+  UNIQUE KEY uq_member_album (memberId, albumId)
+);
+
+SELECT * FROM want_album;
+
+
+
+
+
+
+
+
+
+
+
 
