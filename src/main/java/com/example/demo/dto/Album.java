@@ -16,8 +16,15 @@ public class Album {
     private String genre;
     private String artistName;
     private List<Track> tracks;
+    private double userRating;
 
-    
+    public double getUserRating() {
+        return userRating;
+    }
+
+    public void setUserRating(double userRating) {
+        this.userRating = userRating;
+    }
 
     
 

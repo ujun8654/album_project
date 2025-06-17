@@ -16,13 +16,24 @@ public class Member {
 	private int authLevel;
 	private boolean isSpotifyConnected;
 	private String spotifyProfileUrl;
-
+	private String email;
+	private String publicId;
+	
+	
 	public String getSpotifyProfileUrl() {
 	    return spotifyProfileUrl;
 	}
 	
 	public boolean isSpotifyConnected() {
 	    return isSpotifyConnected;
+	}
+	
+	public String getPublicId() {
+	    return publicId;
+	}
+
+	public void setPublicId(String publicId) {
+	    this.publicId = publicId;
 	}
 	
 	

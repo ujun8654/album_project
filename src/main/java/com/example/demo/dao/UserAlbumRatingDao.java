@@ -1,7 +1,15 @@
 package com.example.demo.dao;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
 import com.example.demo.dto.UserAlbumRating;
-import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface UserAlbumRatingDao {
@@ -43,8 +51,18 @@ public interface UserAlbumRatingDao {
     """)
     Double getAverageRating(@Param("albumId") String albumId);
     
-    
-    
+    @Select("SELECT COUNT(*) FROM album_rating WHERE memberId = #{memberId}")
+    int countByMemberId(@Param("memberId") int memberId);
+
+    @Select("""
+    	    SELECT albumId, rating
+    	    FROM user_album_rating
+    	    WHERE memberId = #{userId}
+    	""")
+    List<Map<String, Object>> getRatingsByUserId(@Param("userId") int userId);
+
+
+
     
     
     

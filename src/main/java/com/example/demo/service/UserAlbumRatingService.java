@@ -1,9 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.dao.UserAlbumRatingDao;
-import com.example.demo.dto.UserAlbumRating;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.example.demo.dao.UserAlbumRatingDao;
+import com.example.demo.dto.UserAlbumRating;
 
 @Service
 public class UserAlbumRatingService {
@@ -36,6 +40,18 @@ public class UserAlbumRatingService {
         UserAlbumRating rating = userAlbumRatingDao.findByMemberAndAlbum(memberId, albumId);
         return (rating != null) ? rating.getRating() : 0.0;
     }
+    
+    public int getRatingCountByMemberId(int memberId) {
+        return userAlbumRatingDao.countByMemberId(memberId);
+    }
+    
+    public List<Map<String, Object>> getRatingsByUserId(int userId) {
+        return userAlbumRatingDao.getRatingsByUserId(userId);
+    }
+
+    
+
+
 
 
 }

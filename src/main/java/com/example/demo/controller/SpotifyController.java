@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.demo.dto.Album;
 import com.example.demo.dto.LoginedMember;
+import com.example.demo.dto.Member;
 import com.example.demo.dto.Track;
 import com.example.demo.service.MemberService;
 import com.example.demo.service.SpotifyAuthService;
@@ -122,23 +123,51 @@ public class SpotifyController {
         return "redirect:" + spotifyAuthService.getAuthorizationUrl();
     }
     
+//    @GetMapping("/spotify/disconnect")
+//    public String disconnectSpotify(HttpSession session) {
+//        // 세션에서 Spotify 관련 정보 제거
+//        session.removeAttribute("spotifyAccessToken");
+//        session.removeAttribute("spotifyProfileUrl");
+//        session.setAttribute("isSpotifyConnected", false); // 세션에서 false로 설정
+//
+//        // 로그인된 사용자 정보 확인 후 DB 업데이트
+//        LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
+//        if (loginedMember != null) {
+//            int memberId = loginedMember.getId();
+//            memberService.disconnectSpotify(memberId);
+//
+//            // 기존 LoginedMember 갱신
+//            loginedMember.setSpotifyConnected(false);
+//            session.setAttribute("loginedMember", loginedMember);
+//        }
+//
+//        // 메인 페이지로 이동
+//        return "redirect:/usr/home/main";
+//    }
+
+
     @GetMapping("/spotify/disconnect")
     public String disconnectSpotify(HttpSession session) {
-        // 세션에서 연동 정보 삭제
         session.removeAttribute("spotifyAccessToken");
         session.removeAttribute("spotifyProfileUrl");
-
-        // ✅ 연동 여부 false로 세션에도 반영
         session.setAttribute("isSpotifyConnected", false);
 
-        // DB에서도 연동 해제
         LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
         if (loginedMember != null) {
             int memberId = loginedMember.getId();
             memberService.disconnectSpotify(memberId);
+
+            Member freshMember = memberService.getMemberById(memberId);
+            session.setAttribute("loginedMember", new LoginedMember(
+                freshMember.getId(),
+                freshMember.getAuthLevel(),
+                freshMember.getLoginId(),
+                freshMember.getEmail(),
+                freshMember.isSpotifyConnected()
+            ));
         }
 
-        return "redirect:/usr/home/main"; // 메인 페이지로 리디렉션
+        return "redirect:/usr/home/main";
     }
 
 

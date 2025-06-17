@@ -40,7 +40,6 @@ public class UsrSpotifyController {
         session.setAttribute("spotifyAccessToken", accessToken);
 
         try {
-            // 사용자 정보 조회
             String userInfoUrl = "https://api.spotify.com/v1/me";
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(accessToken);
@@ -55,20 +54,23 @@ public class UsrSpotifyController {
 
             session.setAttribute("spotifyProfileUrl", profileUrl);
 
-            // ✅ 연동 여부 DB 업데이트
             LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
             if (loginedMember != null) {
                 int memberId = loginedMember.getId();
-                memberService.updateSpotifyConnected(memberId); // 연동 여부 true로 저장
-                memberService.updateSpotifyProfileUrl(memberId, profileUrl); // 프로필 URL도 DB에 저장
-            }
+                memberService.updateSpotifyConnected(memberId);
+                memberService.updateSpotifyProfileUrl(memberId, profileUrl);
 
+                loginedMember.setConnectedToSpotify(true);
+                loginedMember.setSpotifyProfileUrl(profileUrl);
+            }
+            
             // 디버깅
             //System.out.println("세션 저장된 토큰: " + accessToken);
             //System.out.println("저장된 프로필 링크: " + profileUrl);
 
             session.setAttribute("isSpotifyConnected", true);
             session.setAttribute("justConnectedSpotify", true);
+
             return "redirect:/usr/home/main";
 
         } catch (Exception e) {
@@ -77,6 +79,7 @@ public class UsrSpotifyController {
 
         return "redirect:/usr/home/main";
     }
+
 
     @GetMapping("/spotify/recent")
     @ResponseBody

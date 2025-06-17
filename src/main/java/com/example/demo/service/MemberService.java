@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dao.MemberDao;
@@ -20,7 +22,8 @@ public class MemberService {
 	}
 	
 	public void joinMember(String loginId, String loginPw, String email) {
-		memberDao.joinMember(loginId, loginPw, email);
+	    String publicId = UUID.randomUUID().toString();
+	    memberDao.joinMember(loginId, loginPw, email, publicId);
 	}
 
 	public Member getMemberByEmail(String email) {
@@ -44,7 +47,23 @@ public class MemberService {
 	    memberDao.updateSpotifyProfileUrl(memberId, profileUrl);
 	}
 	
-	
+	public Member getMemberById(int id) {
+		return memberDao.getMemberById(id);
+	}
+
+	public Member getMemberByPublicId(String publicId) {
+	    return memberDao.getMemberByPublicId(publicId);
+	}
+
+	public void updateLoginId(int memberId, String loginId) {
+	    memberDao.updateLoginId(memberId, loginId);
+	}
+
+	public boolean isLoginIdDuplicate(String loginId) {
+	    return memberDao.getMemberByLoginId(loginId) != null;
+	}
+
+
 
 	
 

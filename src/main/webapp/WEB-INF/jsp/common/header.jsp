@@ -10,6 +10,14 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   
   <style>
+  
+  .user-select-none {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;   
+  -ms-user-select: none;
+}
+  
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -117,7 +125,7 @@ body {
   flex-shrink: 0;
   margin-left: 24px;
   padding-right: 240px;
-  line-height: 60px; /* 수직 중앙 맞추기 */
+  line-height: 60px;
 }
 
     .navbar .auth a {
@@ -161,19 +169,36 @@ body {
   align-items: center;
 }
 
-
-
 .search-form select:focus {
   border-color: #3b82f6;
   background: #2f2f2f;
 }
 
+.profile-icon-btn {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.profile-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.profile-icon:hover {
+  opacity: 0.8;
+}
 
   </style>
+  
 </head>
 <body>
   <div class="navbar">
-    <a href="/" class="logo">AlbumRate</a>
+    <a href="/" class="logo user-select-none">AlbumRate</a>
     <div class="menu">
       <a href="/albums">앨범</a>
       <a href="/album/wishlist">듣고싶어요</a>
@@ -214,6 +239,12 @@ body {
 
 	  </c:otherwise>
 	</c:choose>
+	
+	<a href="/usr/member/users" class="profile-icon-btn">
+	  <img src="https://an2-glx.amz.wtchn.net/assets/default/user/photo_file_name_small-ab0a7f6a92a282859192ba17dd4822023e22273e168c2daf05795e5171e66446.jpg"
+	       alt="프로필"
+	       class="profile-icon" />
+	</a>
   </c:if>
 </div>
   </div>

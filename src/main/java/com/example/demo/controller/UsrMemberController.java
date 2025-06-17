@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -14,11 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.demo.dto.Album;
 import com.example.demo.dto.LoginedMember;
 import com.example.demo.dto.Member;
 import com.example.demo.dto.Req;
 import com.example.demo.dto.ResultData;
 import com.example.demo.service.MemberService;
+import com.example.demo.service.SpotifyService;
+import com.example.demo.service.UserAlbumRatingService;
 import com.example.demo.util.Util;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,13 +36,17 @@ public class UsrMemberController {
 
 	private final MemberService memberService;
 	private final Req req;
+	private final UserAlbumRatingService userAlbumRatingService;
+	private final SpotifyService spotifyService;
 
 	@Autowired
 	private JavaMailSender mailSender;
 
-	public UsrMemberController(MemberService memberService, Req req) {
+	public UsrMemberController(MemberService memberService, Req req, UserAlbumRatingService userAlbumRatingService, SpotifyService spotifyService) {
 		this.memberService = memberService;
 		this.req = req;
+		this.userAlbumRatingService = userAlbumRatingService;
+		this.spotifyService = spotifyService;
 	}
 
 	@GetMapping("/join")
@@ -173,12 +183,22 @@ public class UsrMemberController {
 	        return "usr/member/login";
 	    }
 
-	    req.login(new LoginedMember(member.getId(), member.getAuthLevel()));
+	    LoginedMember loginedMember = new LoginedMember(
+	        member.getId(),
+	        member.getAuthLevel(),
+	        member.getLoginId(),
+	        member.getEmail(),
+	        member.isSpotifyConnected(),
+	        member.getPublicId() 
+	    );
 
-	    // ✅ 스포티파이 연동 여부 세션 저장
+	    if (member.getSpotifyProfileUrl() != null) {
+	        loginedMember.setSpotifyProfileUrl(member.getSpotifyProfileUrl());
+	    }
+
+	    req.login(loginedMember);
+
 	    session.setAttribute("isSpotifyConnected", member.isSpotifyConnected());
-
-	    // ✅ 프로필 URL 세션 저장
 	    if (member.getSpotifyProfileUrl() != null) {
 	        session.setAttribute("spotifyProfileUrl", member.getSpotifyProfileUrl());
 	    }
@@ -194,27 +214,108 @@ public class UsrMemberController {
 
 
 
- 
-
 	@GetMapping("/logout")
 	public String logout(HttpSession session, HttpServletRequest request) {
 	    String referer = request.getHeader("Referer");
-
 	    session.invalidate();
-
 	    if (referer != null && !referer.contains("/logout")) {
 	        return "redirect:" + referer;
 	    }
-
 	    return "redirect:/usr/home/main";
 	}
-
-
 	@GetMapping("/getLoginId")
 	@ResponseBody
 	public String getLoginId() {
 		return this.memberService.getLoginId(this.req.getLoginedMember().getId());
 	}
 	
+//    @GetMapping("/users")
+//    public String showUserProfilePage() {
+//        return "usr/member/users";
+//    }
+    
+	@GetMapping("/users")
+	public String showUserPage(HttpSession session, Model model) {
+	    LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
+
+	    if (loginedMember == null || loginedMember.getId() == 0) {
+	        return "redirect:/";
+	    }
+
+	    Member profileMember = memberService.getMemberById(loginedMember.getId());
+	    model.addAttribute("profileMember", profileMember);
+
+	    return "usr/member/users";
+	}
+
+
+    
+	@GetMapping("/modify")
+	public String showModifyForm(Model model) {
+	    int loginedId = req.getLoginedMember().getId();
+	    Member member = memberService.getMemberById(loginedId);
+	    model.addAttribute("member", member);
+	    return "usr/member/modify";
+	}
+
+	@PostMapping("/doModify")
+	public String doModify(@RequestParam String loginId, HttpSession session) {
+	    int loginedId = req.getLoginedMember().getId();
+	    memberService.updateLoginId(loginedId, loginId);
+
+	    Member updatedMember = memberService.getMemberById(loginedId);
+	    session.setAttribute("loginedMember", new LoginedMember(updatedMember));
+
+	    return "redirect:/usr/member/users";
+	}
+	
+	@GetMapping("/checkDuplicate")
+	@ResponseBody
+	public Map<String, Boolean> checkDuplicate(@RequestParam String loginId) {
+	    boolean exists = memberService.isLoginIdDuplicate(loginId);
+	    return Collections.singletonMap("exists", exists);
+	}
+	
+	@GetMapping("/ratedAlbums")
+	public String showRatedAlbums(HttpSession session, Model model) {
+	    LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
+
+	    if (loginedMember == null || loginedMember.getId() == 0) {
+	        return "redirect:/usr/member/login";
+	    }
+
+	    int memberId = loginedMember.getId();
+	    List<Map<String, Object>> ratings = userAlbumRatingService.getRatingsByUserId(memberId);
+	    List<Album> ratedAlbums = new ArrayList<>();
+
+	    for (Map<String, Object> entry : ratings) {
+	        String albumId = (String) entry.get("albumId");
+	        double rating = (double) entry.get("rating");
+
+	        Album album = spotifyService.getAlbumDetailById(albumId);
+	        if (album != null) {
+	            album.setUserRating(rating);
+	            ratedAlbums.add(album);
+	        }
+	    }
+
+	    model.addAttribute("ratedAlbums", ratedAlbums);
+	    return "usr/member/ratedAlbums";
+	}
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
 	
 }

@@ -12,17 +12,19 @@ import com.example.demo.dto.Member;
 public interface MemberDao {
 
 	@Insert("""
-		INSERT INTO `member`
-		SET regDate = NOW(),
-		    updateDate = NOW(),
-		    loginId = #{loginId},
-		    loginPw = #{loginPw},
-		    email = #{email}
+		    INSERT INTO `member`
+		    SET regDate = NOW(),
+		        updateDate = NOW(),
+		        loginId = #{loginId},
+		        loginPw = #{loginPw},
+		        email = #{email},
+		        publicId = #{publicId}
 		""")
-	void joinMember(@Param("loginId") String loginId, @Param("loginPw") String loginPw, @Param("email") String email);
+		void joinMember(@Param("loginId") String loginId,  @Param("loginPw") String loginPw,  @Param("email") String email, @Param("publicId") String publicId);
+
 
 	@Select("""
-		    SELECT id, regDate, updateDate, loginId, loginPw, 
+		    SELECT id, regDate, email, updateDate, loginId, loginPw, 
 		           is_spotify_connected AS isSpotifyConnected,
 		           spotify_profile_url AS spotifyProfileUrl
 		    FROM member
@@ -54,6 +56,29 @@ public interface MemberDao {
 
 	@Update("UPDATE member SET spotify_profile_url = #{profileUrl}, updateDate = NOW() WHERE id = #{id}")
 	void updateSpotifyProfileUrl(@Param("id") int id, @Param("profileUrl") String profileUrl);
+
+	
+	@Select("""
+		    SELECT id, regDate, email, updateDate, loginId, loginPw, 
+		           is_spotify_connected AS isSpotifyConnected,
+		           spotify_profile_url AS spotifyProfileUrl
+		    FROM member
+		    WHERE id = #{id}
+		""")
+		Member getMemberById(@Param("id") int id);
+	
+	@Select("""
+		    SELECT *
+		    FROM member
+		    WHERE publicId = #{publicId}
+		""")
+		Member getMemberByPublicId(@Param("publicId") String publicId);
+	
+	@Update("UPDATE member SET loginId = #{loginId} WHERE id = #{memberId}")
+	void updateLoginId(@Param("memberId") int memberId, @Param("loginId") String loginId);
+	
+	
+
 
 
 }

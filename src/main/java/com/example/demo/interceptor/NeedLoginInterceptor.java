@@ -17,16 +17,39 @@ public class NeedLoginInterceptor implements HandlerInterceptor {
 		this.req = req;
 	}
 	
+//	@Override
+//	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+//			throws Exception {
+//		
+//		if (req.getLoginedMember().getId() == 0) {
+//			req.jsPrintReplace("로그인 후 이용해주세요", "/usr/member/login");
+//			return false;
+//		}
+//		
+//		return HandlerInterceptor.super.preHandle(request, response, handler);
+//	}
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-			throws Exception {
-		
-		if (req.getLoginedMember().getId() == 0) {
-			req.jsPrintReplace("로그인 후 이용해주세요", "/usr/member/login");
-			return false;
-		}
-		
-		return HandlerInterceptor.super.preHandle(request, response, handler);
+	        throws Exception {
+		//디버깅
+		//System.out.println("컨트롤러 접근함");
+
+	    String currentUri = request.getRequestURI();
+
+	    if (req.getLoginedMember().getId() == 0) {
+	        if (currentUri.equals("/usr/member/users")) {
+	            response.sendRedirect("/");
+	            return false;
+	        }
+
+	        req.jsPrintReplace("로그인 후 이용해주세요", "/usr/member/login");
+	        return false;
+	    }
+
+	    return HandlerInterceptor.super.preHandle(request, response, handler);
 	}
+
+	
 	
 }
