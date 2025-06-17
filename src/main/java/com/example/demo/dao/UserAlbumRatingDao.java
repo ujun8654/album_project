@@ -58,6 +58,7 @@ public interface UserAlbumRatingDao {
     	    SELECT albumId, rating
     	    FROM user_album_rating
     	    WHERE memberId = #{userId}
+    	    ORDER BY regDate DESC
     	""")
     List<Map<String, Object>> getRatingsByUserId(@Param("userId") int userId);
 

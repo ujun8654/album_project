@@ -63,6 +63,10 @@ public class MemberService {
 	    return memberDao.getMemberByLoginId(loginId) != null;
 	}
 
+	public void updateProfileImg(int memberId, String profileImgUrl) {
+	    memberDao.updateProfileImg(memberId, profileImgUrl);
+	}
+	
 
 
 	

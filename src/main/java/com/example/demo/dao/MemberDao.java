@@ -77,6 +77,13 @@ public interface MemberDao {
 	@Update("UPDATE member SET loginId = #{loginId} WHERE id = #{memberId}")
 	void updateLoginId(@Param("memberId") int memberId, @Param("loginId") String loginId);
 	
+	@Update("UPDATE member SET profileImage = #{profileImgUrl}, updateDate = NOW() WHERE id = #{memberId}")
+	void updateProfileImg(@Param("memberId") int memberId, @Param("profileImgUrl") String profileImgUrl);
+	
+	
+
+	
+	
 	
 
 

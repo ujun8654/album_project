@@ -1,10 +1,14 @@
 package com.example.demo.controller;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.Album;
 import com.example.demo.dto.LoginedMember;
@@ -259,15 +264,46 @@ public class UsrMemberController {
 	}
 
 	@PostMapping("/doModify")
-	public String doModify(@RequestParam String loginId, HttpSession session) {
+	public String doModify(@RequestParam String loginId,
+	                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+	                       HttpSession session, HttpServletRequest request) {
+
 	    int loginedId = req.getLoginedMember().getId();
+	    String profileImgUrl = null;
+
+	    // 1. 프로필 이미지 저장 처리
+	    if (profileImage != null && !profileImage.isEmpty()) {
+	        try {
+	            // 실행 중인 webapp 경로 (ex: /Users/.../target/demo-1.0.0/profileImg)
+	            String realPath = request.getServletContext().getRealPath("/profileImg");
+	            File dir = new File(realPath);
+	            if (!dir.exists()) dir.mkdirs();
+
+	            String fileName = UUID.randomUUID().toString() + "_" + profileImage.getOriginalFilename();
+	            File destFile = new File(dir, fileName);
+	            profileImage.transferTo(destFile);
+
+	            profileImgUrl = "/profileImg/" + fileName;
+	            memberService.updateProfileImg(loginedId, profileImgUrl);
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    // 로그인 ID 수정
 	    memberService.updateLoginId(loginedId, loginId);
 
+	    // 세션 갱신
 	    Member updatedMember = memberService.getMemberById(loginedId);
 	    session.setAttribute("loginedMember", new LoginedMember(updatedMember));
 
 	    return "redirect:/usr/member/users";
 	}
+
+
+
+
 	
 	@GetMapping("/checkDuplicate")
 	@ResponseBody
@@ -286,7 +322,9 @@ public class UsrMemberController {
 
 	    int memberId = loginedMember.getId();
 	    List<Map<String, Object>> ratings = userAlbumRatingService.getRatingsByUserId(memberId);
-	    List<Album> ratedAlbums = new ArrayList<>();
+
+	    List<Album> flatList = new ArrayList<>();
+	    Map<Double, List<Album>> grouped = new TreeMap<>(Comparator.reverseOrder());
 
 	    for (Map<String, Object> entry : ratings) {
 	        String albumId = (String) entry.get("albumId");
@@ -295,12 +333,37 @@ public class UsrMemberController {
 	        Album album = spotifyService.getAlbumDetailById(albumId);
 	        if (album != null) {
 	            album.setUserRating(rating);
-	            ratedAlbums.add(album);
+	            flatList.add(album);
+	            grouped.computeIfAbsent(rating, k -> new ArrayList<>()).add(album);
 	        }
 	    }
 
-	    model.addAttribute("ratedAlbums", ratedAlbums);
+	    model.addAttribute("ratedAlbums", flatList);      
+	    model.addAttribute("groupedAlbums", grouped);   
 	    return "usr/member/ratedAlbums";
+	}
+
+
+	@GetMapping("/usr/member/ratedAlbums/grouped")
+	public String showGroupedRatedAlbums(HttpSession session, Model model) {
+	    int memberId = ((LoginedMember) session.getAttribute("loginedMember")).getId();
+	    List<Map<String, Object>> ratingList = userAlbumRatingService.getRatingsByUserId(memberId);
+
+	    Map<Double, List<Album>> grouped = new TreeMap<>(Comparator.reverseOrder());
+
+	    for (Map<String, Object> entry : ratingList) {
+	        String albumId = (String) entry.get("albumId");
+	        double rating = (double) entry.get("rating");
+
+	        Album album = spotifyService.getAlbumDetailById(albumId);
+	        if (album != null) {
+	            album.setUserRating(rating);
+	            grouped.computeIfAbsent(rating, k -> new ArrayList<>()).add(album);
+	        }
+	    }
+
+	    model.addAttribute("groupedAlbums", grouped);
+	    return "usr/member/ratedAlbumsGrouped";
 	}
 
 

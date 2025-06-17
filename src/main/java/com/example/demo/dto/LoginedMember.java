@@ -15,6 +15,7 @@ public class LoginedMember {
 	private boolean isConnectedToSpotify;
 	private String spotifyProfileUrl;
 	private String publicId;
+	private String profileImgUrl;
 	
 	public LoginedMember(int id, int authLevel, String loginId, String email) {
 	    this.id = id;
@@ -48,6 +49,15 @@ public class LoginedMember {
         this.isConnectedToSpotify = member.isSpotifyConnected();
         this.spotifyProfileUrl = member.getSpotifyProfileUrl();
     }
+    
+    public LoginedMember(int id, int authLevel, String loginId, String email, String profileImgUrl) {
+        this.id = id;
+        this.authLevel = authLevel;
+        this.loginId = loginId;
+        this.email = email;
+        this.profileImgUrl = profileImgUrl;
+    }
+    
 
 	public boolean isConnectedToSpotify() {
 	    return isConnectedToSpotify;
@@ -72,5 +82,7 @@ public class LoginedMember {
 	public String getPublicId() {
 	    return publicId;
 	}
+	
+	
 	
 }

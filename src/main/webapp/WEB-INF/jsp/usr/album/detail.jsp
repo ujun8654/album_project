@@ -120,7 +120,7 @@
 }
 
 .star-fill svg path {
-  fill: #f5c518;
+  fill: #4b5563; 
 }
 
 .cancel-tooltip {

@@ -60,25 +60,25 @@
     text-align: center;
     margin-bottom: 20px;
   }
+  
+.edit-profile-btn {
+  background: #f9f9f9;
+  color: #7E7E7E;
+  border: none; /* 테두리 제거 */
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
 
-  .edit-profile-btn {
-    background: #f9f9f9;
-    color: #7E7E7E;
-    border: 1px solid #ccc;
-    padding: 12px 24px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border-radius: 12px;
-  }
 
-  .edit-profile-btn:hover {
-    background: #f0f0f0;
-    color: #000;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  }
-
+.edit-profile-btn:hover {
+  background: #f0f0f0;
+  color: #000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
   .stats {
     margin-top: 10px;
     text-align: center;
@@ -214,9 +214,6 @@
   margin-top: 1px;
   text-align: left;
 }
-
-  
-  
   
 </style>
 
@@ -272,7 +269,6 @@
   </div>
 </a>
 
-
 </div>
 
 <div id="editProfileModal">
@@ -289,7 +285,6 @@
 	  </div>
 	  <button type="submit" class="modal-button">저장</button>
 	</form>
-
 
   </div>
 </div>
@@ -344,6 +339,8 @@ const loginIdInput = document.getElementById("loginId");
 const nameError = document.getElementById("nameError");
 const duplicateError = document.getElementById("duplicateError");
 
+const currentLoginId = "${profileMember.loginId}";
+
 function showError(msgElem) {
   nameError.style.display = "none";
   duplicateError.style.display = "none";
@@ -375,6 +372,12 @@ if (form) {
       return;
     }
 
+    if (value === currentLoginId) {
+    	  form.submit();
+    	  return;
+    	}
+
+
     $.ajax({
       url: "/usr/member/checkDuplicate",
       type: "GET",
@@ -395,4 +398,3 @@ if (form) {
   });
 }
 </script>
-

@@ -18,6 +18,7 @@ public class Member {
 	private String spotifyProfileUrl;
 	private String email;
 	private String publicId;
+	private String profileImgUrl;
 	
 	
 	public String getSpotifyProfileUrl() {
@@ -34,6 +35,14 @@ public class Member {
 
 	public void setPublicId(String publicId) {
 	    this.publicId = publicId;
+	}
+	
+	public String getProfileImgUrl() {
+	    return profileImgUrl;
+	}
+
+	public void setProfileImgUrl(String profileImgUrl) {
+	    this.profileImgUrl = profileImgUrl;
 	}
 	
 	
