@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dao.UserAlbumRatingDao;
@@ -14,6 +16,7 @@ public class UserAlbumRatingService {
 
     @Autowired
     private UserAlbumRatingDao userAlbumRatingDao;
+    
 
     public void saveOrUpdate(int memberId, String albumId, double rating) {
         UserAlbumRating existing = userAlbumRatingDao.findByMemberAndAlbum(memberId, albumId);
@@ -49,7 +52,7 @@ public class UserAlbumRatingService {
         return userAlbumRatingDao.getRatingsByUserId(userId);
     }
 
-    
+
 
 
 

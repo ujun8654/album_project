@@ -14,7 +14,8 @@ CREATE TABLE `member` (
     publicId VARCHAR(36) UNIQUE
 );
 UPDATE MEMBER SET publicId = UUID() WHERE publicId IS NULL;
-ALTER TABLE MEMBER MODIFY publicId VARCHAR(36) NOT NULL UNIQUE;
+ALTER TABLE `member` MODIFY publicId VARCHAR(36) NOT NULL UNIQUE;
+ALTER TABLE `member` ADD COLUMN profileImage VARCHAR(255);
 
 SELECT * FROM `member`;
 
@@ -40,15 +41,5 @@ CREATE TABLE want_album (
 );
 
 SELECT * FROM want_album;
-
-
-
-
-
-
-
-
-
-
 
 

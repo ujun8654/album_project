@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ include file="/WEB-INF/jsp/common/header.jsp" %>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <style>
   body {
     background-color: #f5f5f5;
@@ -9,9 +9,10 @@
     margin: 0;
     padding: 0;
   }
+  
 
   .profile-container {
-    max-width: 700px;
+    max-width: 600px;
     margin: 50px auto;
     background: #fff;
     border-radius: 9px;
@@ -64,7 +65,7 @@
 .edit-profile-btn {
   background: #f9f9f9;
   color: #7E7E7E;
-  border: none; /* 테두리 제거 */
+  border: none;
   padding: 12px 24px;
   font-size: 14px;
   font-weight: bold;
@@ -215,6 +216,109 @@
   text-align: left;
 }
   
+#calendar-table {
+  width: auto;
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+#calendar-table td {
+  height: 72px;
+  vertical-align: middle;
+  padding: 0;
+}
+
+#calendar-table div {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 36px;
+  text-align: center;
+  border-radius: 50%;
+  color: #222;
+  font-weight: 400;
+}
+
+.prev-month-day,
+.next-month-day {
+  color: transparent !important;
+}
+  
+
+.today {
+  background: #4b5563;
+  color: white !important;
+  font-weight: bold;
+}
+
+.calendar-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 30px;
+}
+
+.tlUksHXD {
+  height: 15px;	
+  font-size: 18px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #aaa;
+  font-weight: bold;
+  padding: 0 20px;
+}
+
+.calendar-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #111;
+}
+
+
+
+
+
+
+
+
+
+
+
+.calendar-day {
+    position: relative;
+    padding: 10px;
+}
+
+.album-cover-container {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.album-cover-container img {
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+}
+
+.album-count {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 12px;
+    padding: 2px 5px;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+
 </style>
 
 <div class="profile-container">
@@ -269,6 +373,35 @@
   </div>
 </a>
 
+<hr class="section-divider" />
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+  <h2 style="font-size: 16px; font-weight: bold; color: #333;">캘린더</h2>
+  <button onclick="goToday()" style="font-size: 13px; padding: 4px 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer;">오늘</button>
+</div>
+
+<div class="calendar-nav">
+  <button onclick="moveMonth(-1)" class="tlUksHXD">
+    <img src="https://an2-ast.amz.wtchn.net/ayg/images/calendar_arrow_left.c47de43e2eae7980.svg" class="arrow left" />
+  </button>
+  
+  <span id="calendar-year-month" class="calendar-title"></span>
+  
+  <button onclick="moveMonth(1)" class="tlUksHXD">
+    <img src="https://an2-ast.amz.wtchn.net/ayg/images/calendar_arrow_right.faad017b1a0c3b51.svg" class="arrow right" />
+  </button>
+</div>
+
+
+<table style="width: 100%; border-collapse: collapse; text-align: center;" id="calendar-table">
+  <thead>
+    <tr style="font-size: 14px; color: #666;">
+      <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+    </tr>
+  </thead>
+  <tbody id="calendar-body">
+  </tbody>
+</table>
+
 </div>
 
 <div id="editProfileModal">
@@ -285,11 +418,13 @@
 	  </div>
 	  <button type="submit" class="modal-button">저장</button>
 	</form>
-
   </div>
 </div>
 
-<%@ include file="/WEB-INF/jsp/common/footer.jsp" %>
+
+
+
+
 
 <script>
 function openEditModal() {
@@ -397,4 +532,152 @@ if (form) {
     });
   });
 }
+
+const today = new Date();
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth();
+
+function renderCalendar(year, month) {
+  const tbody = document.getElementById('calendar-body');
+  const yearMonth = document.getElementById('calendar-year-month');
+  const paddedMonth = ("0" + (month + 1)).slice(-2);
+  yearMonth.textContent = year + "." + paddedMonth;
+
+  let html = '';
+  const firstDayOfMonth = new Date(year, month, 1);
+  const startingDayOfWeek = firstDayOfMonth.getDay();
+  const startDate = new Date(year, month, 1 - startingDayOfWeek);
+
+  for (let i = 0; i < 6; i++) {
+	  html += '<tr>';
+	  for (let j = 0; j < 7; j++) {
+	    const currentDate = new Date(startDate);
+	    currentDate.setDate(startDate.getDate() + (i * 7) + j);
+
+	    const day = currentDate.getDate();
+	    const currentDayMonth = currentDate.getMonth();
+	    const currentDayYear = currentDate.getFullYear();
+
+	    let cellClass = '';
+	    if (currentDayYear < year || (currentDayYear === year && currentDayMonth < month)) {
+	      cellClass = 'prev-month-day';
+	    } else if (currentDayYear > year || (currentDayYear === year && currentDayMonth > month)) {
+	      cellClass = 'next-month-day';
+	    }
+
+	    const isToday = (
+	      currentDayYear === today.getFullYear() &&
+	      currentDayMonth === today.getMonth() &&
+	      day === today.getDate()
+	    );
+
+	    let backgroundStyle = '';
+	    let textColor = '';
+	    if (isToday) {
+	      backgroundStyle = 'background:#4b5563; color:white; font-weight:bold;';
+	    } else if (!cellClass) {
+	      textColor = 'color:#333;';
+	    }
+
+	    let content = '';
+	    if (!cellClass) {
+	      content = day;
+	    }
+
+	    html += '<td>' +
+	      '<div class="' + cellClass + '" style="width: 32px; height: 32px; line-height: 32px; font-size: 14px; text-align: center; border-radius: 50%; ' + backgroundStyle + ' ' + textColor + '">' +
+	      content +
+	      '</div>' +
+	      '</td>';
+	  }
+	  html += '</tr>';
+	}
+
+
+  tbody.innerHTML = html;
+}
+
+function moveMonth(diff) {
+  currentMonth += diff;
+  if (currentMonth < 0) {
+    currentMonth = 11;
+    currentYear--;
+  } else if (currentMonth > 11) {
+    currentMonth = 0;
+    currentYear++;
+  }
+  renderCalendar(currentYear, currentMonth);
+}
+
+function goToday() {
+  currentYear = today.getFullYear();
+  currentMonth = today.getMonth();
+  renderCalendar(currentYear, currentMonth);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+	  console.log("캘린더 렌더링 시작");
+	  renderCalendar(currentYear, currentMonth);
+	});
+
+
+
+
+
+
+
+
+
+
+
+//서버에서 받은 데이터 예시
+const albumData = [
+    {
+        date: '2025-06-18',
+        albums: [
+            { cover: 'album1.jpg' },
+            { cover: 'album2.jpg' }
+        ]
+    },
+    {
+        date: '2025-06-20',
+        albums: [{ cover: 'album3.jpg' }]
+    }
+];
+
+// 데이터를 바탕으로 캘린더에 반영
+albumData.forEach(item => {
+    const dayCell = document.querySelector(`.calendar-day[data-date="${item.date}"]`);
+
+    if (dayCell) {
+        const albumContainer = document.createElement('div');
+        albumContainer.classList.add('album-cover-container');
+
+        // 앨범 이미지 추가
+        item.albums.forEach(album => {
+            const img = document.createElement('img');
+            img.src = album.cover;
+            img.alt = 'Album Cover';
+            albumContainer.appendChild(img);
+        });
+
+        // 여러 앨범이 있을 경우 숫자 추가
+        if (item.albums.length > 1) {
+            const count = document.createElement('span');
+            count.classList.add('album-count');
+            count.textContent = item.albums.length; // 앨범 개수
+            albumContainer.appendChild(count);
+        }
+
+        dayCell.appendChild(albumContainer);
+    }
+});
+
+
+
+
+
+
 </script>
+
+<%@ include file="/WEB-INF/jsp/common/footer.jsp" %>

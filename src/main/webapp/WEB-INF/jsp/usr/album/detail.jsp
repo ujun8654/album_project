@@ -5,9 +5,9 @@
 <style>
 .album-detail-container {
   display: flex;
-  justify-content: center;
-  gap: 60px;
-  padding: 40px;
+  justify-content: flex-start;
+  gap: 30px;
+  padding: 40px 270px;
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -18,7 +18,7 @@
 
 .album-info img {
   width: 100%;
-  border-radius: 12px;
+  border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -59,6 +59,7 @@
 .tracklist {
   flex-grow: 1;
   max-width: 600px;
+  text-align: left;
 }
 
 .tracklist h2 {
@@ -67,8 +68,10 @@
 }
 
 .tracklist ol {
-  padding-left: 20px;
+  padding-left: 0;
+  margin-left: 0;
 }
+
 
 .tracklist li {
   margin-bottom: 10px;
@@ -80,6 +83,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-width: 450px;
+  width: 100%;
 }
 
 .star-wrap {
@@ -276,6 +281,87 @@
 
 
 
+
+
+
+.album-comment-section {
+  width: 350px;
+  min-height: 500px;
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.album-comment-section h2 {
+  font-size: 18px;
+  margin-bottom: 0;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+}
+
+.comment-list {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment-item {
+  background: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.comment-user {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #555;
+}
+
+.comment-text {
+  font-size: 14px;
+  color: #222;
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comment-textarea {
+  resize: none;
+  min-height: 80px;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.comment-submit {
+  align-self: flex-end;
+  padding: 6px 16px;
+  background-color: #111;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.comment-submit:hover {
+  background-color: #333;
+}
+
+
 </style>
 
 <div class="album-detail-container">
@@ -303,7 +389,7 @@
       </div>
     </div>
 
-    <h3>by ${album.artist}</h3>
+    <h3>${album.artist}</h3>
     <p>발매일: ${album.releaseDate}</p>
     <div class="avg-rating" style="margin-top: 10px; font-size: 14px; color: #666;">
       평균 별점: <c:out value="${avgRating}" />점
@@ -353,6 +439,27 @@
       </c:forEach>
     </ol>
   </div>
+  
+	<div class="album-comment-section">
+	  <h2>앨범 코멘트</h2>
+	
+	  <div class="comment-list">
+	    <div class="comment-item">
+	      <div class="comment-user">사용자1</div>
+	      <div class="comment-text">이 앨범 진짜 전설이다...</div>
+	    </div>
+	    <div class="comment-item">
+	      <div class="comment-user">사용자2</div>
+	      <div class="comment-text">Hip Hop is NOT dead 🔥</div>
+	    </div>
+	  </div>
+	
+	  <div class="comment-form">
+	    <textarea class="comment-textarea" placeholder="코멘트를 입력하세요..."></textarea>
+	    <button class="comment-submit">등록</button>
+	  </div>
+	</div>
+
 </div>
 
 <div id="loginModal">

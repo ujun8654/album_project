@@ -188,29 +188,34 @@ public class SpotifyService {
             JsonNode items = root.path("albums").path("items");
 
             for (JsonNode item : items) {
-                String albumType = item.path("album_type").asText();
+                String albumType = item.path("album_type").asText(); // album, single, compilation
                 int totalTracks = item.path("total_tracks").asInt();
+                JsonNode artists = item.path("artists");
 
-                if (albumType.equalsIgnoreCase("single") || totalTracks <= 2) {
+                // 정규 앨범만 필터링: 싱글, 컴필레이션, 참여곡, 아티스트 3명 이상, 트랙 2곡 이하는 제외
+                if (!albumType.equalsIgnoreCase("album")) continue;
+                if (totalTracks <= 2) continue; // 싱글 회피용
+                if (artists.size() > 2) continue; // 참여곡/컴필레벨의 다중 아티스트 필터링
+                
+                String title = item.path("name").asText().toLowerCase();
+                if (title.contains("greatest") || title.contains("hits") || title.contains("best") || title.contains("playlist") || title.contains("collection")) {
+                    continue; // 컴필레이션 느낌나는 제목 제거
+                }
+
+                String artist = artists.get(0).path("name").asText();
+
+                // 기존 필터 유지
+                if (!(title.startsWith(keywordLower) || artist.toLowerCase().startsWith(keywordLower))) {
                     continue;
                 }
 
-                String title = item.path("name").asText();
-                String artist = item.path("artists").get(0).path("name").asText();
-
-                if (!(title.toLowerCase().startsWith(keywordLower) || artist.toLowerCase().startsWith(keywordLower))) {
-                    continue;
-                }
-
-                String uniqueKey = title.toLowerCase().trim() + "|" + artist.toLowerCase().trim();
-                if (albumKeys.contains(uniqueKey)) {
-                    continue;
-                }
+                String uniqueKey = title.trim() + "|" + artist.toLowerCase().trim();
+                if (albumKeys.contains(uniqueKey)) continue;
                 albumKeys.add(uniqueKey);
 
                 Album album = new Album();
                 album.setSpotifyId(item.path("id").asText());
-                album.setTitle(title);
+                album.setTitle(item.path("name").asText());
                 album.setArtist(artist);
                 album.setCoverImgUrl(item.path("images").get(0).path("url").asText());
                 album.setReleaseDate(item.path("release_date").asText());
@@ -219,6 +224,7 @@ public class SpotifyService {
 
                 albums.add(album);
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -303,7 +309,6 @@ public class SpotifyService {
 
         return albums;
     }
-    
     public List<Album> searchAlbumsByGenre(String genre) {
         String accessToken = getAccessToken();
         if (accessToken == null) return Collections.emptyList();
@@ -313,7 +318,7 @@ public class SpotifyService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         String encodedGenre = URLEncoder.encode(genre, StandardCharsets.UTF_8);
-        String url = "https://api.spotify.com/v1/search?q=" + encodedGenre + "&type=album&limit=20";
+        String url = "https://api.spotify.com/v1/search?q=" + encodedGenre + "&type=album&limit=50";
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
@@ -328,11 +333,27 @@ public class SpotifyService {
             JsonNode items = root.path("albums").path("items");
 
             List<Album> albums = new ArrayList<>();
+            Set<String> seen = new HashSet<>();
+
             for (JsonNode item : items) {
+                String albumType = item.path("album_type").asText();
+                int totalTracks = item.path("total_tracks").asInt();
+                JsonNode artists = item.path("artists");
+                String title = item.path("name").asText().toLowerCase();
+
+                if (!albumType.equalsIgnoreCase("album")) continue;
+                if (totalTracks <= 2) continue;
+                if (artists.size() > 2) continue;
+                if (title.contains("hits") || title.contains("playlist") || title.contains("greatest") || title.contains("collection")) continue;
+
+                String uniqueKey = title + "|" + artists.get(0).path("name").asText().toLowerCase().trim();
+                if (seen.contains(uniqueKey)) continue;
+                seen.add(uniqueKey);
+
                 Album album = new Album();
                 album.setSpotifyId(item.path("id").asText());
                 album.setTitle(item.path("name").asText());
-                album.setArtist(item.path("artists").get(0).path("name").asText());
+                album.setArtist(artists.get(0).path("name").asText());
                 album.setCoverImgUrl(item.path("images").get(0).path("url").asText());
                 album.setReleaseDate(item.path("release_date").asText());
                 album.setSpotifyUrl(item.path("external_urls").path("spotify").asText());
@@ -341,11 +362,14 @@ public class SpotifyService {
             }
 
             return albums;
+
         } catch (Exception e) {
             e.printStackTrace();
-            return Collections.emptyList();
         }
+
+        return Collections.emptyList();
     }
+
     
     public Album getAlbumDetailById(String spotifyId) {
         String accessToken = getAccessToken();
@@ -380,7 +404,7 @@ public class SpotifyService {
     }
     
     public List<Track> getTracksByAlbumId(String albumId) {
-        String url = "https://api.spotify.com/v1/albums/" + albumId + "/tracks";
+        String url = "https://api.spotify.com/v1/albums/" + albumId + "/tracks?limit=50";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(getAccessToken());
@@ -498,7 +522,7 @@ public class SpotifyService {
         Map<String, Object> body = response.getBody();
         if (body != null && body.containsKey("external_urls")) {
             Map<String, String> urls = (Map<String, String>) body.get("external_urls");
-            return urls.get("spotify"); // ✅ 프로필 URL 반환
+            return urls.get("spotify");
         }
 
         return null;

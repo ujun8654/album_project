@@ -202,7 +202,7 @@ body {
     <div class="menu">
       <a href="/albums">앨범</a>
       <a href="/album/wishlist">듣고싶어요</a>
-      <a href="#">통계</a>
+      <a href="/usr/member/users">통계</a>
       <a href="#">친구</a>
 <form action="/albums/search" method="get" class="search-form" onsubmit="return !!this.keyword.value.trim();">
   <input
