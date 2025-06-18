@@ -13,6 +13,7 @@ CREATE TABLE `member` (
     spotify_profile_url TEXT,
     publicId VARCHAR(36) UNIQUE
 );
+
 UPDATE MEMBER SET publicId = UUID() WHERE publicId IS NULL;
 ALTER TABLE `member` MODIFY publicId VARCHAR(36) NOT NULL UNIQUE;
 ALTER TABLE `member` ADD COLUMN profileImage VARCHAR(255);
