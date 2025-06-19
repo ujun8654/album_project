@@ -78,12 +78,12 @@
   font-size: 16px;
   padding: 8px 12px;
   background-color: #f7f7f7;
-  border-radius: 6px;
+  border-radius: 4px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 450px;
+  max-width: 500px;
   width: 100%;
 }
 
@@ -279,23 +279,19 @@
   color: #000;
 }
 
-
-
-
-
-
 .album-comment-section {
-  width: 350px;
-  min-height: 500px;
+  width: 500px;
+  height : 500px;
   background-color: #f5f5f5;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 20px;
   font-family: 'Segoe UI', sans-serif;
 }
+
 
 .album-comment-section h2 {
   font-size: 18px;
@@ -339,13 +335,16 @@
 }
 
 .comment-textarea {
-  resize: none;
+  resize: none;              /* ← 크기 조절 핸들 제거 */
+  overflow: auto;            /* 내용 넘치면 스크롤 가능 */
+  width: 100%;               /* 원하는 너비 설정 */
   min-height: 80px;
   padding: 10px;
   font-size: 14px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
+
 
 .comment-submit {
   align-self: flex-end;
@@ -362,6 +361,84 @@
 }
 
 
+.comment-list::-webkit-scrollbar {
+  width: 6px;
+}
+.comment-list::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 3px;
+}
+.comment-list::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+  .album-comment-section {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .album-comment-section h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 6px;
+  }
+
+  .comment-list {
+    margin-bottom: 20px;
+  }
+
+  .comment-item {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+
+  .comment-user {
+    font-weight: 600;
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 4px;
+  }
+
+  .comment-text {
+    font-size: 15px;
+    color: #222;
+  }
+
+  #commentTextarea {
+    resize: none;
+    width: 95%;
+    height: 40px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+    margin-bottom: 12px;
+  }
+
+  #commentSubmitBtn {
+    background-color: #4b5563;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  #commentSubmitBtn:hover {
+    background-color: #374151;
+  }
+  
+  
+  
 </style>
 
 <div class="album-detail-container">
@@ -397,7 +474,8 @@
 
     <hr style="margin: 16px 0; border: none; border-top: 1px solid #ddd;" />
 
-    <div style="display: flex; align-items: center; gap: 16px; margin-top: 10px;">
+    <div style="display: flex; align-items: center; gap: 16px; margin-top: 10px; margin-left: 20px;">
+
 	  <div id="wantToggleBtn"
 	     class="want-toggle-btn ${isWanted ? 'want-active' : 'want-inactive'}"
 	     data-album-id="${album.spotifyId}"
@@ -425,7 +503,16 @@
         </svg>
         <span>Spotify에서 보기</span>
       </div>
+      
+      <div class="want-toggle-btn comment-btn want-inactive">
+  	    <svg viewBox="0 0 24 24">
+	      <path d="M4 4h16v12H5.17L4 17.17V4zm0-2a2 2 0 0 0-2 2v20l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4z" fill="#888"/>
+  	    </svg>
+	    <span>코멘트</span>
+	  </div>
     </div>
+    
+    
   </div>
 
   <div class="tracklist">
@@ -440,25 +527,15 @@
     </ol>
   </div>
   
-	<div class="album-comment-section">
-	  <h2>앨범 코멘트</h2>
-	
-	  <div class="comment-list">
-	    <div class="comment-item">
-	      <div class="comment-user">사용자1</div>
-	      <div class="comment-text">이 앨범 진짜 전설이다...</div>
-	    </div>
-	    <div class="comment-item">
-	      <div class="comment-user">사용자2</div>
-	      <div class="comment-text">Hip Hop is NOT dead 🔥</div>
-	    </div>
-	  </div>
-	
-	  <div class="comment-form">
-	    <textarea class="comment-textarea" placeholder="코멘트를 입력하세요..."></textarea>
-	    <button class="comment-submit">등록</button>
-	  </div>
+  
+	<input type="hidden" id="albumId" value="${album.id}" />
+	<div class="album-comment-section" style="display: none;">
+	  <h2>코멘트</h2>
+	  <div class="comment-list"></div>
+	  <textarea id="commentTextarea" placeholder="코멘트를 입력하세요"></textarea>
+	  <button id="commentSubmitBtn">등록</button>
 	</div>
+
 
 </div>
 
@@ -476,13 +553,21 @@
 
 <%@ include file="/WEB-INF/jsp/common/footer.jsp" %>
 
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const wrap = document.querySelector(".star-wrap");
   const isLoggedIn = wrap?.dataset.userLoggedIn === "true";
+  const albumId = wrap?.dataset.albumId;
   const starBoxes = wrap?.querySelectorAll(".star-box") || [];
   const tooltip = document.getElementById("cancelTooltip");
   const loginModal = document.getElementById("loginModal");
+
+  const lastAlbumId = sessionStorage.getItem("lastViewedAlbumId");
+  if (lastAlbumId !== albumId) {
+    sessionStorage.removeItem("commentOpen");
+    sessionStorage.setItem("lastViewedAlbumId", albumId);
+  }
 
   let currentRating = 0;
   <c:if test="${userRating > 0}">
@@ -493,7 +578,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function setRating(rating) {
     starBoxes.forEach((box, i) => {
       const fill = box.querySelector(".star-fill");
-      fill.style.width = i < Math.floor(rating) ? "100%" : i === Math.floor(rating) ? ((rating % 1) * 100) + "%" : "0%";
+      fill.style.width = i < Math.floor(rating)
+        ? "100%"
+        : i === Math.floor(rating)
+        ? ((rating % 1) * 100) + "%"
+        : "0%";
     });
   }
 
@@ -520,11 +609,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   wrap?.addEventListener("click", (e) => {
-    if (!isLoggedIn) {
-      loginModal.style.display = "flex";
-      return;
-    }
+    if (!isLoggedIn) return loginModal.style.display = "flex";
 
+    const content = commentTextarea.value.trim();
     const rect = wrap.getBoundingClientRect();
     const offsetX = e.clientX - rect.left;
     const widthPerStar = rect.width / 5;
@@ -534,22 +621,19 @@ document.addEventListener("DOMContentLoaded", () => {
     setRating(currentRating);
     tooltip.style.display = "none";
 
-    fetch("/usr/album/albums/" + wrap.dataset.albumId + "/rate", {
+    fetch("/usr/album/albums/" + albumId + "/rate", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: "rating=" + currentRating
     });
   });
 
+  // 듣고싶어요 버튼
   const wantBtn = document.getElementById("wantToggleBtn");
   if (wantBtn) {
     wantBtn.addEventListener("click", () => {
-      if (!isLoggedIn) {
-        loginModal.style.display = "flex";
-        return;
-      }
+      if (!isLoggedIn) return loginModal.style.display = "flex";
 
-      const albumId = wantBtn.dataset.albumId;
       fetch(`/album/${albumId}/want-toggle`, { method: "POST" })
         .then(res => res.json())
         .then(data => {
@@ -580,23 +664,92 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 로그인 모달 관련
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      loginModal.style.display = "none";
-    }
+    if (e.key === "Escape") loginModal.style.display = "none";
   });
 
   loginModal.addEventListener("click", (e) => {
     const modalContent = loginModal.querySelector(".modal-content");
-    if (!modalContent.contains(e.target)) {
-      loginModal.style.display = "none";
-    }
+    if (!modalContent.contains(e.target)) loginModal.style.display = "none";
   });
 
-  const closeBtn = loginModal.querySelector(".modal-close");
-  closeBtn.addEventListener("click", () => {
+  loginModal.querySelector(".modal-close")?.addEventListener("click", () => {
     loginModal.style.display = "none";
   });
+
+  // ✅ 코멘트 기능
+  const commentToggleBtn = document.querySelector(".comment-btn");
+  const commentSection = document.querySelector(".album-comment-section");
+  const commentSubmitBtn = document.getElementById("commentSubmitBtn");
+  const commentTextarea = document.getElementById("commentTextarea");
+  const commentList = document.querySelector(".comment-list");
+
+  if (!commentToggleBtn || !commentSection || !albumId) return;
+
+  // 새로고침 시 열린 상태 유지 + 댓글 로딩
+  if (sessionStorage.getItem("commentOpen") === "true") {
+    commentSection.style.display = "flex";
+    loadComments();
+  }
+
+  commentToggleBtn.addEventListener("click", () => {
+    const isVisible = commentSection.style.display === "flex";
+    commentSection.style.display = isVisible ? "none" : "flex";
+    sessionStorage.setItem("commentOpen", (!isVisible).toString());
+
+    if (!isVisible && commentList.children.length === 0) {
+      loadComments();
+    }
+  });
+  
+  commentTextarea.addEventListener("keydown", (e) => {
+	  if (e.key === "Enter" && !e.shiftKey) {
+	    e.preventDefault(); // 줄바꿈 막고
+	    commentSubmitBtn.click(); // 등록 버튼 클릭 트리거
+	  }
+	});
+
+
+  commentSubmitBtn?.addEventListener("click", () => {
+    const content = commentTextarea.value.trim();
+    if (!content) return alert("내용을 입력하세요.");
+
+    fetch("/usr/album/comment/write", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "albumId=" + encodeURIComponent(albumId) + "&content=" + encodeURIComponent(content)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success || data.resultCode?.startsWith("S-")) {
+          commentTextarea.value = "";
+          loadComments();
+        } else {
+          alert(data.msg || "등록 실패");
+        }
+      })
+      .catch(() => alert("댓글 등록 중 오류 발생"));
+  });
+
+  function loadComments() {
+    fetch("/usr/album/comment/list?albumId=" + encodeURIComponent(albumId))
+      .then(res => res.json())
+      .then(comments => {
+        commentList.innerHTML = "";
+        comments.forEach(comment => {
+          const div = document.createElement("div");
+          div.className = "comment-item";
+          div.innerHTML =
+            '<div class="comment-user">익명</div>' +
+            '<div class="comment-text">' + comment.content + '</div>';
+          commentList.appendChild(div);
+        });
+      });
+  }
 });
 </script>
+
+
+
 

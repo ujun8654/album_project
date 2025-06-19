@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.demo.dto.Album;
+import com.example.demo.dto.AlbumComment;
 import com.example.demo.dto.LoginedMember;
 import com.example.demo.dto.Member;
 import com.example.demo.dto.Track;
+import com.example.demo.service.AlbumCommentService;
 import com.example.demo.service.MemberService;
 import com.example.demo.service.SpotifyAuthService;
 import com.example.demo.service.SpotifyService;
@@ -32,13 +34,15 @@ public class SpotifyController {
     private final WantAlbumService wantAlbumService;
     private final SpotifyAuthService spotifyAuthService;
     private final MemberService memberService;
+    private final AlbumCommentService albumCommentService;
 
-    public SpotifyController(SpotifyService spotifyService, UserAlbumRatingService userAlbumRatingService, WantAlbumService wantAlbumService, SpotifyAuthService spotifyAuthService, MemberService memberService) {
+    public SpotifyController(SpotifyService spotifyService, UserAlbumRatingService userAlbumRatingService, WantAlbumService wantAlbumService, SpotifyAuthService spotifyAuthService, MemberService memberService, AlbumCommentService albumCommentService) {
         this.spotifyService = spotifyService;
         this.userAlbumRatingService = userAlbumRatingService;
         this.wantAlbumService = wantAlbumService;
         this.spotifyAuthService = spotifyAuthService;
         this.memberService = memberService;
+        this.albumCommentService = albumCommentService;
     }
     @GetMapping("/albums")
     public String showAlbums(Model model) {
@@ -93,6 +97,9 @@ public class SpotifyController {
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("albumId", albumId);
         model.addAttribute("isWanted", isWanted); 
+        
+        List<AlbumComment> comments = albumCommentService.getComments(albumId);
+        model.addAttribute("comments", comments);
 
         return "usr/album/detail";
     }

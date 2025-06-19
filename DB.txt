@@ -43,4 +43,16 @@ CREATE TABLE want_album (
 
 SELECT * FROM want_album;
 
+CREATE TABLE album_comment (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  album_id VARCHAR(255) NOT NULL,
+  member_id INT UNSIGNED NOT NULL,
+  content TEXT NOT NULL,
+  reg_date DATETIME DEFAULT NOW(),
+
+  FOREIGN KEY (member_id) REFERENCES MEMBER(id) ON DELETE CASCADE
+);
+
+
+SELECT * FROM album_comment;
 

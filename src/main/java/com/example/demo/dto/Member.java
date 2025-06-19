@@ -23,6 +23,7 @@ public class Member {
 	
 	public String getSpotifyProfileUrl() {
 	    return spotifyProfileUrl;
+	    
 	}
 	
 	public boolean isSpotifyConnected() {
