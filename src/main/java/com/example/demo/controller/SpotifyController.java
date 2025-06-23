@@ -104,7 +104,6 @@ public class SpotifyController {
         return "usr/album/detail";
     }
 
-    
     @PostMapping("/album/{id}/want-toggle")
     @ResponseBody
     public Map<String, Object> toggleWantAlbum(
@@ -129,29 +128,6 @@ public class SpotifyController {
     public String redirectToSpotifyAuth() {
         return "redirect:" + spotifyAuthService.getAuthorizationUrl();
     }
-    
-//    @GetMapping("/spotify/disconnect")
-//    public String disconnectSpotify(HttpSession session) {
-//        // 세션에서 Spotify 관련 정보 제거
-//        session.removeAttribute("spotifyAccessToken");
-//        session.removeAttribute("spotifyProfileUrl");
-//        session.setAttribute("isSpotifyConnected", false); // 세션에서 false로 설정
-//
-//        // 로그인된 사용자 정보 확인 후 DB 업데이트
-//        LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
-//        if (loginedMember != null) {
-//            int memberId = loginedMember.getId();
-//            memberService.disconnectSpotify(memberId);
-//
-//            // 기존 LoginedMember 갱신
-//            loginedMember.setSpotifyConnected(false);
-//            session.setAttribute("loginedMember", loginedMember);
-//        }
-//
-//        // 메인 페이지로 이동
-//        return "redirect:/usr/home/main";
-//    }
-
 
     @GetMapping("/spotify/disconnect")
     public String disconnectSpotify(HttpSession session) {
@@ -173,11 +149,7 @@ public class SpotifyController {
                 freshMember.isSpotifyConnected()
             ));
         }
-
         return "redirect:/usr/home/main";
     }
-
-
-
 
 }

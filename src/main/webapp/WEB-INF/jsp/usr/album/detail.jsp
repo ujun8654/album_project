@@ -335,16 +335,15 @@
 }
 
 .comment-textarea {
-  resize: none;              /* ← 크기 조절 핸들 제거 */
-  overflow: auto;            /* 내용 넘치면 스크롤 가능 */
-  width: 100%;               /* 원하는 너비 설정 */
+  resize: none;
+  overflow: auto;
+  width: 100%;
   min-height: 80px;
   padding: 10px;
   font-size: 14px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
-
 
 .comment-submit {
   align-self: flex-end;
@@ -436,8 +435,6 @@
   #commentSubmitBtn:hover {
     background-color: #374151;
   }
-  
-  
   
 </style>
 
@@ -549,10 +546,7 @@
   </div>
 </div>
 
-
-
 <%@ include file="/WEB-INF/jsp/common/footer.jsp" %>
-
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -628,7 +622,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 듣고싶어요 버튼
   const wantBtn = document.getElementById("wantToggleBtn");
   if (wantBtn) {
     wantBtn.addEventListener("click", () => {
@@ -664,7 +657,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 로그인 모달 관련
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") loginModal.style.display = "none";
   });
@@ -678,7 +670,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loginModal.style.display = "none";
   });
 
-  // ✅ 코멘트 기능
   const commentToggleBtn = document.querySelector(".comment-btn");
   const commentSection = document.querySelector(".album-comment-section");
   const commentSubmitBtn = document.getElementById("commentSubmitBtn");
@@ -687,7 +678,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!commentToggleBtn || !commentSection || !albumId) return;
 
-  // 새로고침 시 열린 상태 유지 + 댓글 로딩
   if (sessionStorage.getItem("commentOpen") === "true") {
     commentSection.style.display = "flex";
     loadComments();
@@ -705,8 +695,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
   commentTextarea.addEventListener("keydown", (e) => {
 	  if (e.key === "Enter" && !e.shiftKey) {
-	    e.preventDefault(); // 줄바꿈 막고
-	    commentSubmitBtn.click(); // 등록 버튼 클릭 트리거
+	    e.preventDefault();
+	    commentSubmitBtn.click();
 	  }
 	});
 

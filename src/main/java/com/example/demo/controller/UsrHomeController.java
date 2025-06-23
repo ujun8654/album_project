@@ -31,14 +31,5 @@ public class UsrHomeController {
 		return "redirect:/usr/home/main";
 	}
 	
-	@GetMapping("/usr/home/apiTest1")
-	public String apiTest1() {
-		return "usr/home/apiTest1";
-	}
-	
-	@GetMapping("/usr/home/apiTest2")
-	public String apiTest2() {
-		return "usr/home/apiTest2";
-	}
 	
 }

@@ -85,7 +85,7 @@ public class SpotifyAuthService {
         ResponseEntity<Map> response = restTemplate.postForEntity(tokenEndpoint, request, Map.class);
 
         //디버깅
-        //System.out.println("🟡 Spotify 응답: " + response.getBody());
+        //System.out.println("Spotify 응답: " + response.getBody());
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("토큰 발급 실패: " + response);
@@ -93,6 +93,4 @@ public class SpotifyAuthService {
 
         return (String) response.getBody().get("access_token");
     }
-
-
 }

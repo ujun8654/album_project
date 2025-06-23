@@ -620,17 +620,6 @@ document.addEventListener("DOMContentLoaded", function () {
 	  renderCalendar(currentYear, currentMonth);
 	});
 
-
-
-
-
-
-
-
-
-
-
-//서버에서 받은 데이터 예시
 const albumData = [
     {
         date: '2025-06-18',
@@ -645,7 +634,6 @@ const albumData = [
     }
 ];
 
-// 데이터를 바탕으로 캘린더에 반영
 albumData.forEach(item => {
     const dayCell = document.querySelector(`.calendar-day[data-date="${item.date}"]`);
 
@@ -653,7 +641,6 @@ albumData.forEach(item => {
         const albumContainer = document.createElement('div');
         albumContainer.classList.add('album-cover-container');
 
-        // 앨범 이미지 추가
         item.albums.forEach(album => {
             const img = document.createElement('img');
             img.src = album.cover;
@@ -661,21 +648,16 @@ albumData.forEach(item => {
             albumContainer.appendChild(img);
         });
 
-        // 여러 앨범이 있을 경우 숫자 추가
         if (item.albums.length > 1) {
             const count = document.createElement('span');
             count.classList.add('album-count');
-            count.textContent = item.albums.length; // 앨범 개수
+            count.textContent = item.albums.length;
             albumContainer.appendChild(count);
         }
 
         dayCell.appendChild(albumContainer);
     }
 });
-
-
-
-
 
 
 </script>

@@ -16,7 +16,6 @@ public class MemberService {
 		this.memberDao = memberDao;
 	}
 
-
 	public Member getMemberByLoginId(String loginId) {
 		return this.memberDao.getMemberByLoginId(loginId);
 	}
@@ -66,11 +65,4 @@ public class MemberService {
 	public void updateProfileImg(int memberId, String profileImgUrl) {
 	    memberDao.updateProfileImg(memberId, profileImgUrl);
 	}
-	
-
-
-	
-
-
-
 }

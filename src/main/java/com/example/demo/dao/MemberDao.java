@@ -80,14 +80,6 @@ public interface MemberDao {
 	@Update("UPDATE member SET profileImage = #{profileImgUrl}, updateDate = NOW() WHERE id = #{memberId}")
 	void updateProfileImg(@Param("memberId") int memberId, @Param("profileImgUrl") String profileImgUrl);
 	
-	
-
-	
-	
-	
-
-
-
 }
 
 

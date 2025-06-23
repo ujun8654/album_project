@@ -188,23 +188,21 @@ public class SpotifyService {
             JsonNode items = root.path("albums").path("items");
 
             for (JsonNode item : items) {
-                String albumType = item.path("album_type").asText(); // album, single, compilation
+                String albumType = item.path("album_type").asText();
                 int totalTracks = item.path("total_tracks").asInt();
                 JsonNode artists = item.path("artists");
 
-                // 정규 앨범만 필터링: 싱글, 컴필레이션, 참여곡, 아티스트 3명 이상, 트랙 2곡 이하는 제외
                 if (!albumType.equalsIgnoreCase("album")) continue;
-                if (totalTracks <= 2) continue; // 싱글 회피용
-                if (artists.size() > 2) continue; // 참여곡/컴필레벨의 다중 아티스트 필터링
+                if (totalTracks <= 2) continue;
+                if (artists.size() > 2) continue;
                 
                 String title = item.path("name").asText().toLowerCase();
                 if (title.contains("greatest") || title.contains("hits") || title.contains("best") || title.contains("playlist") || title.contains("collection")) {
-                    continue; // 컴필레이션 느낌나는 제목 제거
+                    continue;
                 }
 
                 String artist = artists.get(0).path("name").asText();
 
-                // 기존 필터 유지
                 if (!(title.startsWith(keywordLower) || artist.toLowerCase().startsWith(keywordLower))) {
                     continue;
                 }
@@ -224,7 +222,6 @@ public class SpotifyService {
 
                 albums.add(album);
             }
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -370,7 +367,6 @@ public class SpotifyService {
         return Collections.emptyList();
     }
 
-    
     public Album getAlbumDetailById(String spotifyId) {
         String accessToken = getAccessToken();
         String url = "https://api.spotify.com/v1/albums/" + spotifyId;
@@ -527,14 +523,5 @@ public class SpotifyService {
 
         return null;
     }
-
-
-
-
-
-
-    
-
-
 
 }

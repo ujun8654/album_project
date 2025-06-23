@@ -3,20 +3,15 @@ CREATE DATABASE SB_AM;
 USE SB_AM;
 
 CREATE TABLE `member` (
-    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    regDate DATETIME NOT NULL,
-    updateDate DATETIME NOT NULL,
-    loginId VARCHAR(50) NOT NULL UNIQUE,
-    loginPw VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE,
-    is_spotify_connected BOOLEAN NOT NULL DEFAULT FALSE,
-    spotify_profile_url TEXT,
-    publicId VARCHAR(36) UNIQUE
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
+    , regDate DATETIME NOT NULL
+    , updateDate DATETIME NOT NULL
+    , loginId VARCHAR(50) NOT NULL UNIQUE
+    , loginPw VARCHAR(100) NOT NULL
+    , email VARCHAR(100) UNIQUE
+    , is_spotify_connected BOOLEAN NOT NULL DEFAULT FALSE
+    , spotify_profile_url TEXT, publicId VARCHAR(36) UNIQUE
 );
-
-UPDATE MEMBER SET publicId = UUID() WHERE publicId IS NULL;
-ALTER TABLE `member` MODIFY publicId VARCHAR(36) NOT NULL UNIQUE;
-ALTER TABLE `member` ADD COLUMN profileImage VARCHAR(255);
 
 SELECT * FROM `member`;
 
@@ -34,25 +29,22 @@ CREATE TABLE user_album_rating (
 SELECT * FROM user_album_rating;
 
 CREATE TABLE want_album (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  memberId BIGINT NOT NULL,
-  albumId VARCHAR(100) NOT NULL,
-  regDate DATETIME DEFAULT NOW(),
-  UNIQUE KEY uq_member_album (memberId, albumId)
+  id BIGINT PRIMARY KEY AUTO_INCREMENT
+  , memberId BIGINT NOT NULL
+  , albumId VARCHAR(100) NOT NULL
+  , regDate DATETIME DEFAULT NOW()
+  , UNIQUE KEY uq_member_album (memberId, albumId)
 );
 
 SELECT * FROM want_album;
 
 CREATE TABLE album_comment (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  album_id VARCHAR(255) NOT NULL,
-  member_id INT UNSIGNED NOT NULL,
-  content TEXT NOT NULL,
-  reg_date DATETIME DEFAULT NOW(),
-
-  FOREIGN KEY (member_id) REFERENCES MEMBER(id) ON DELETE CASCADE
+  id INT AUTO_INCREMENT PRIMARY KEY
+  , album_id VARCHAR(255) NOT NULL
+  , member_id INT UNSIGNED NOT NULL
+  , content TEXT NOT NULL, reg_date DATETIME DEFAULT NOW()
+  , FOREIGN KEY (member_id) REFERENCES MEMBER(id) ON DELETE CASCADE
 );
-
 
 SELECT * FROM album_comment;
 

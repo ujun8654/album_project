@@ -27,6 +27,7 @@ public class UsrAlbumController {
     @ResponseBody
     public ResultData rateAlbum(@PathVariable String albumId, @RequestParam double rating, HttpSession session) {
         LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
+        
 //디버깅
 //        System.out.println("albumId = " + albumId);
 //        System.out.println("rating = " + rating);
@@ -40,10 +41,6 @@ public class UsrAlbumController {
 
         return ResultData.from("S-1", "평점이 저장되었습니다.");
     }
-    
-
-
-
 
 }
 

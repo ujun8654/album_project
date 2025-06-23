@@ -122,20 +122,14 @@ public class UsrMemberController {
 	    session.removeAttribute("emailAuthCode");
 	    session.removeAttribute("emailAuthTarget");
 //디버깅
-	    //System.out.println("✅ 회원가입 후 로그아웃 직전 ID: " + req.getLoginedMember().getId());
+	    //System.out.println("회원가입 후 로그아웃 직전 ID: " + req.getLoginedMember().getId());
 
 	    req.logout();
 
-	    //System.out.println("✅ 로그아웃 후 ID: " + req.getLoginedMember().getId());
+	    //System.out.println("로그아웃 후 ID: " + req.getLoginedMember().getId());
 
-	    
 	    return "redirect:/usr/member/login";
 	}
-
-
-
-
-
 
 	@PostMapping("/sendEmailCode")
 	@ResponseBody
@@ -175,9 +169,6 @@ public class UsrMemberController {
 
 	    return "usr/member/login";
 	}
-
-
-
 
 	@PostMapping("/doLogin")
 	public String doLogin(String loginId, String loginPw, Model model, HttpSession session) {
@@ -234,11 +225,6 @@ public class UsrMemberController {
 		return this.memberService.getLoginId(this.req.getLoginedMember().getId());
 	}
 	
-//    @GetMapping("/users")
-//    public String showUserProfilePage() {
-//        return "usr/member/users";
-//    }
-    
 	@GetMapping("/users")
 	public String showUserPage(HttpSession session, Model model) {
 	    LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
@@ -252,8 +238,6 @@ public class UsrMemberController {
 
 	    return "usr/member/users";
 	}
-
-
     
 	@GetMapping("/modify")
 	public String showModifyForm(Model model) {
@@ -271,10 +255,8 @@ public class UsrMemberController {
 	    int loginedId = req.getLoginedMember().getId();
 	    String profileImgUrl = null;
 
-	    // 1. 프로필 이미지 저장 처리
 	    if (profileImage != null && !profileImage.isEmpty()) {
 	        try {
-	            // 실행 중인 webapp 경로 (ex: /Users/.../target/demo-1.0.0/profileImg)
 	            String realPath = request.getServletContext().getRealPath("/profileImg");
 	            File dir = new File(realPath);
 	            if (!dir.exists()) dir.mkdirs();
@@ -291,20 +273,14 @@ public class UsrMemberController {
 	        }
 	    }
 
-	    // 로그인 ID 수정
 	    memberService.updateLoginId(loginedId, loginId);
 
-	    // 세션 갱신
 	    Member updatedMember = memberService.getMemberById(loginedId);
 	    session.setAttribute("loginedMember", new LoginedMember(updatedMember));
 
 	    return "redirect:/usr/member/users";
 	}
 
-
-
-
-	
 	@GetMapping("/checkDuplicate")
 	@ResponseBody
 	public Map<String, Boolean> checkDuplicate(@RequestParam String loginId) {
@@ -343,7 +319,6 @@ public class UsrMemberController {
 	    return "usr/member/ratedAlbums";
 	}
 
-
 	@GetMapping("/usr/member/ratedAlbums/grouped")
 	public String showGroupedRatedAlbums(HttpSession session, Model model) {
 	    int memberId = ((LoginedMember) session.getAttribute("loginedMember")).getId();
@@ -366,19 +341,4 @@ public class UsrMemberController {
 	    return "usr/member/ratedAlbumsGrouped";
 	}
 
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-	
 }

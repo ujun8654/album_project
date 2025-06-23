@@ -26,6 +26,4 @@ public class Album {
         this.userRating = userRating;
     }
 
-    
-
 }

@@ -80,7 +80,4 @@
   </div>
 </div>
 
-
-
-
 <%@ include file="/WEB-INF/jsp/common/footer.jsp" %>

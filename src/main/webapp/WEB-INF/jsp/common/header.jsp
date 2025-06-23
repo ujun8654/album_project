@@ -249,7 +249,6 @@ body {
 </div>
   </div>
   
-  
 <c:if test="${sessionScope.justConnectedSpotify}">
   <script>
     window.open("${sessionScope.spotifyProfileUrl}", "_blank");

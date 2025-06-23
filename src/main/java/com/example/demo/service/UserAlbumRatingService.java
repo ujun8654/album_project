@@ -52,9 +52,4 @@ public class UserAlbumRatingService {
         return userAlbumRatingDao.getRatingsByUserId(userId);
     }
 
-
-
-
-
-
 }

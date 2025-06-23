@@ -62,12 +62,4 @@ public interface UserAlbumRatingDao {
     	""")
     List<Map<String, Object>> getRatingsByUserId(@Param("userId") int userId);
 
-
-
-
-    
-    
-    
-    
-    
 }

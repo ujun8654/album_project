@@ -48,7 +48,7 @@ public class UsrAlbumCommentController {
         albumCommentService.writeComment(albumId, member.getId(), content);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("writerName", member.getLoginId());  //
+        data.put("writerName", member.getLoginId());
 
         return ResultData.from("S-1", "코멘트가 작성되었습니다.", data);
     }

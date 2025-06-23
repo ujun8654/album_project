@@ -19,18 +19,20 @@ public class AlbumService {
     }
 
     public Album getAlbumById(int id) {
-        System.out.println("✔ getAlbumById() 호출됨"); // ✅ 로그 찍기
+       //디버깅
+    	//System.out.println("getAlbumById() 호출됨");
 
         Album album = albumDao.getAlbumById(id);
-        System.out.println("✔ album: " + album); // ✅ null 아닌지 확인
+      //디버깅
+        //System.out.println("album: " + album);
 
         List<Track> tracks = spotifyService.getTracksByAlbumId(album.getSpotifyId());
-        System.out.println("✔ 트랙 불러오기 호출"); // ✅ 이거 찍히면 spotifyService 진입함
+      //디버깅
+        //System.out.println("트랙 불러오기 호출");
 
         album.setTracks(tracks);
         return album;
     }
-
 
     public void addAlbum(Album album) {
         albumDao.addAlbum(album);
@@ -43,9 +45,4 @@ public class AlbumService {
     public void addRating(UserAlbumRating rating) {
         albumDao.addRating(rating);
     }
-    
-    
-    
-    
-    
 }

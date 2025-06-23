@@ -17,18 +17,6 @@ public class NeedLoginInterceptor implements HandlerInterceptor {
 		this.req = req;
 	}
 	
-//	@Override
-//	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-//			throws Exception {
-//		
-//		if (req.getLoginedMember().getId() == 0) {
-//			req.jsPrintReplace("로그인 후 이용해주세요", "/usr/member/login");
-//			return false;
-//		}
-//		
-//		return HandlerInterceptor.super.preHandle(request, response, handler);
-//	}
-
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 	        throws Exception {
@@ -49,7 +37,4 @@ public class NeedLoginInterceptor implements HandlerInterceptor {
 
 	    return HandlerInterceptor.super.preHandle(request, response, handler);
 	}
-
-	
-	
 }

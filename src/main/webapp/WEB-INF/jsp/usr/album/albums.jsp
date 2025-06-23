@@ -89,7 +89,6 @@
   font-weight: bold;
   
 }
-
   
 </style>
 
@@ -99,7 +98,6 @@
     “<span>${fn:escapeXml(keyword)}</span>” 검색결과
   </div>
 </c:if>
-
 
 </div>
 
