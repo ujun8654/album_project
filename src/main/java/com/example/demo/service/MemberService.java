@@ -65,4 +65,11 @@ public class MemberService {
 	public void updateProfileImg(int memberId, String profileImgUrl) {
 	    memberDao.updateProfileImg(memberId, profileImgUrl);
 	}
+	
+	public void updateSpotifyRefreshToken(int memberId, String refreshToken) {
+	    memberDao.updateSpotifyRefreshToken(memberId, refreshToken);
+	}
+
+	
+	
 }

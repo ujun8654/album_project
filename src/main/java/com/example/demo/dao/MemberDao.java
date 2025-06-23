@@ -26,12 +26,12 @@ public interface MemberDao {
 	@Select("""
 		    SELECT id, regDate, email, updateDate, loginId, loginPw, 
 		           is_spotify_connected AS isSpotifyConnected,
-		           spotify_profile_url AS spotifyProfileUrl
+		           spotify_profile_url AS spotifyProfileUrl,
+		           spotify_refresh_token AS spotifyRefreshToken
 		    FROM member
 		    WHERE loginId = #{loginId}
 		""")
-
-	Member getMemberByLoginId(String loginId);
+		Member getMemberByLoginId(String loginId);
 
 
 	@Select("""
@@ -61,7 +61,8 @@ public interface MemberDao {
 	@Select("""
 		    SELECT id, regDate, email, updateDate, loginId, loginPw, 
 		           is_spotify_connected AS isSpotifyConnected,
-		           spotify_profile_url AS spotifyProfileUrl
+		           spotify_profile_url AS spotifyProfileUrl,
+		           spotify_refresh_token AS spotifyRefreshToken
 		    FROM member
 		    WHERE id = #{id}
 		""")
@@ -79,6 +80,16 @@ public interface MemberDao {
 	
 	@Update("UPDATE member SET profileImage = #{profileImgUrl}, updateDate = NOW() WHERE id = #{memberId}")
 	void updateProfileImg(@Param("memberId") int memberId, @Param("profileImgUrl") String profileImgUrl);
+	
+	@Update("""
+		    UPDATE member
+		    SET spotify_refresh_token = #{refreshToken}, updateDate = NOW()
+		    WHERE id = #{memberId}
+		""")
+		void updateSpotifyRefreshToken(@Param("memberId") int memberId, @Param("refreshToken") String refreshToken);
+
+
+	
 	
 }
 

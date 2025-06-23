@@ -10,8 +10,11 @@ CREATE TABLE `member` (
     , loginPw VARCHAR(100) NOT NULL
     , email VARCHAR(100) UNIQUE
     , is_spotify_connected BOOLEAN NOT NULL DEFAULT FALSE
-    , spotify_profile_url TEXT, publicId VARCHAR(36) UNIQUE
+    , spotify_profile_url TEXT
+    , publicId VARCHAR(36) UNIQUE
+    , spotify_refresh_token TEXT
 );
+
 
 SELECT * FROM `member`;
 

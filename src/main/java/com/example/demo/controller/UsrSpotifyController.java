@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.util.Map;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,10 +38,15 @@ public class UsrSpotifyController {
     public String handleSpotifyCallback(@RequestParam("code") String code,
                                         @RequestParam(value = "state", required = false) String state,
                                         HttpSession session) {
-        String accessToken = spotifyService.exchangeCodeForAccessToken(code);
-        session.setAttribute("spotifyAccessToken", accessToken);
-
         try {
+            Map<String, String> tokens = spotifyService.exchangeCodeForTokens(code);
+            String accessToken = tokens.get("access_token");
+            String refreshToken = tokens.get("refresh_token");
+
+            session.setAttribute("spotifyAccessToken", accessToken);
+            session.setAttribute("spotifyRefreshToken", refreshToken);
+            session.setAttribute("spotifyAccessTokenExpiresAt", System.currentTimeMillis() + 3600 * 1000);
+
             String userInfoUrl = "https://api.spotify.com/v1/me";
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(accessToken);
@@ -57,21 +64,17 @@ public class UsrSpotifyController {
             LoginedMember loginedMember = (LoginedMember) session.getAttribute("loginedMember");
             if (loginedMember != null) {
                 int memberId = loginedMember.getId();
+
                 memberService.updateSpotifyConnected(memberId);
                 memberService.updateSpotifyProfileUrl(memberId, profileUrl);
+                memberService.updateSpotifyRefreshToken(memberId, refreshToken);
 
                 loginedMember.setConnectedToSpotify(true);
                 loginedMember.setSpotifyProfileUrl(profileUrl);
             }
-            
-            // 디버깅
-            //System.out.println("세션 저장된 토큰: " + accessToken);
-            //System.out.println("저장된 프로필 링크: " + profileUrl);
 
             session.setAttribute("isSpotifyConnected", true);
             session.setAttribute("justConnectedSpotify", true);
-
-            return "redirect:/usr/home/main";
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -179,24 +179,31 @@ public class UsrMemberController {
 	        return "usr/member/login";
 	    }
 
+	    member = memberService.getMemberById(member.getId());
+
 	    LoginedMember loginedMember = new LoginedMember(
 	        member.getId(),
 	        member.getAuthLevel(),
 	        member.getLoginId(),
 	        member.getEmail(),
 	        member.isSpotifyConnected(),
-	        member.getPublicId() 
+	        member.getPublicId()
 	    );
 
-	    if (member.getSpotifyProfileUrl() != null) {
-	        loginedMember.setSpotifyProfileUrl(member.getSpotifyProfileUrl());
-	    }
-
 	    req.login(loginedMember);
-
+	    session.setAttribute("loginedMember", loginedMember);
 	    session.setAttribute("isSpotifyConnected", member.isSpotifyConnected());
-	    if (member.getSpotifyProfileUrl() != null) {
-	        session.setAttribute("spotifyProfileUrl", member.getSpotifyProfileUrl());
+
+	    String refreshToken = member.getSpotifyRefreshToken();
+	    if (refreshToken != null && !refreshToken.isEmpty()) {
+	        try {
+	            String newAccessToken = spotifyService.refreshAccessToken(refreshToken);
+	            session.setAttribute("spotifyAccessToken", newAccessToken);
+	            session.setAttribute("spotifyRefreshToken", refreshToken);
+	            session.setAttribute("spotifyAccessTokenExpiresAt", System.currentTimeMillis() + 3600 * 1000);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
 	    }
 
 	    String redirectUri = (String) session.getAttribute("redirectAfterLogin");
@@ -207,6 +214,17 @@ public class UsrMemberController {
 
 	    return "redirect:/";
 	}
+
+	@GetMapping("/doLogin")
+	public String redirectToLoginPage() {
+	    return "redirect:/usr/member/login";
+	}
+
+	
+
+
+
+
 
 
 

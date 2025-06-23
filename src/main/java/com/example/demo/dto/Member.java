@@ -19,7 +19,7 @@ public class Member {
 	private String email;
 	private String publicId;
 	private String profileImgUrl;
-	
+	private String spotifyRefreshToken;
 	
 	public String getSpotifyProfileUrl() {
 	    return spotifyProfileUrl;
@@ -44,6 +44,14 @@ public class Member {
 
 	public void setProfileImgUrl(String profileImgUrl) {
 	    this.profileImgUrl = profileImgUrl;
+	}
+	
+	public String getSpotifyRefreshToken() {
+	    return spotifyRefreshToken;
+	}
+
+	public void setSpotifyRefreshToken(String spotifyRefreshToken) {
+	    this.spotifyRefreshToken = spotifyRefreshToken;
 	}
 	
 	
